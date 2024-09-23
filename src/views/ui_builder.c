@@ -9,6 +9,7 @@
 #include "indicators/battery_indicator.h"
 #include "indicators/numeric_label.h"
 #include "indicators/basic_level_indicator.h"
+#include "indicators/bluetooth_indicator.h"
 
 const double DIAL_INIT_VALUE = 0.0;
 
@@ -54,6 +55,9 @@ app_widget_ref_struct *app_builder(void) {
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_01), appWidgetsT->w_indicator_01, TRUE, TRUE, 10);
 
    appWidgetsT->w_indicator_box_02 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_02"));
+   appWidgetsT->w_indicator_02 = bluetooth_indicator_new();
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_02), appWidgetsT->w_indicator_02, TRUE, TRUE, 10);
+
    appWidgetsT->w_indicator_box_10 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_10"));
    appWidgetsT->w_indicator_box_11 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_11"));
    appWidgetsT->w_indicator_box_12 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_12"));
@@ -77,6 +81,7 @@ app_widget_ref_struct *app_builder(void) {
    gtk_widget_show(appWidgetsT->w_dial);
    gtk_widget_show(appWidgetsT->w_indicator_00);
    gtk_widget_show(appWidgetsT->w_indicator_01);
+   gtk_widget_show(appWidgetsT->w_indicator_02);
 
    g_object_unref(builder);
    return appWidgetsT;

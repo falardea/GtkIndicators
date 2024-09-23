@@ -76,6 +76,8 @@ set(MY_SOURCES
     src/indicators/numeric_label.h
     src/indicators/basic_level_indicator.c
     src/indicators/basic_level_indicator.h
+    src/indicators/bluetooth_indicator.c
+    src/indicators/bluetooth_indicator.h
 )
 
 include_directories(${PROJECT_SOURCE_DIR})
