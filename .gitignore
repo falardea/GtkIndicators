@@ -1,0 +1,10 @@
+/.idea
+/src/version.h
+/cmake_install.cmake
+/CMakeCache.txt
+/Makefile
+/cmake-build-debug/
+/CMakeFiles/
+/target/
+/gtk_indicators.gresource.c
+/resources/style/gtk_indicators_style.css

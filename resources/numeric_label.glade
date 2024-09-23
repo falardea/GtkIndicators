@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <template class="NumericLabel" parent="GtkBin">
+    <property name="name">numeric-label-root-bin</property>
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkLabel" id="label_ref">
+        <property name="name">label-ref</property>
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">+1.2e-3</property>
+      </object>
+    </child>
+  </template>
+</interface>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/resource_path">
+        <file preprocess="xml-stripblanks">resources/gtk_indicators.glade</file>
+        <file preprocess="xml-stripblanks">resources/numeric_label.glade</file>
+        <file>resources/style/gtk_indicators_style.css</file>
+    </gresource>
+</gresources>
