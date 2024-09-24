@@ -165,12 +165,12 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    gtk_render_frame(context, cr, 0, 0, width, height);
    gtk_style_context_add_class(gtk_widget_get_style_context(widget), "bluetooth-indicator-class");
 
-   int line_width = 4;
+   int line_width = 3;
    cairo_set_source_rgba(cr, 0.0, 0.0, 255.0, 1.0);
    cairo_set_line_width(cr, line_width);
    gboolean vertical_orientation = TRUE;
-   float bm = (float)line_width; // base margin
-   float whr = 2.0f/4.0f; // width-to-height-ratio
+   float bm = 1.0f; // base margin
+   float whr = 3.0f/5.0f; // width-to-height-ratio
    float padx, pady;
 
    // float indicator_w = (float)width;
@@ -179,7 +179,7 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float indicator_h = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   if ((float)height <= (((float)width-((float)line_width/2))/whr))
+   if ((float)height <= (( (float)width/whr - ((float)line_width) )))
    {
       padx = (indicator_w - indicator_h*whr) / 2.0f;
       pady = 0;
@@ -190,17 +190,17 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
       pady = (indicator_h - indicator_w/whr) / 2.0f;
    }
 
-   float rad = ((float)width/2.0f) - padx;
-   float Ax = padx;
-   float Ay = rad;
-   float Bx = (float)width - padx;
-   float By = rad;
+   float rad = ((float)width/2.0f) - padx - bm;
+   float Ax = padx + bm;
+   float Ay = rad + pady + bm;
+   float Bx = (float)width - padx - bm;
+   float By = Ay;
    float Cx = Bx;
-   float Cy = (float)height - rad;
+   float Cy = (float)height - rad - pady - bm;
    float Dx = Ax;
    float Dy = Cy;
    float ctx = (float)width/2.0f;
-   float cty = rad;
+   float cty = Ay;
    float cbx = ctx;
    float cby = Cy;
 
@@ -220,8 +220,8 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_source_rgba(cr, 255.0, 255, 255.0, 1.0);
    cairo_move_to(cr, Ax + fm, Ay);
    cairo_line_to(cr, Cx - fm, Cy);
-   cairo_line_to(cr, ctx, (float)height - fm);
-   cairo_line_to(cr, ctx, fm);
+   cairo_line_to(cr, ctx, Cy + rad - fm);
+   cairo_line_to(cr, ctx, Ay - rad + fm);
    cairo_line_to(cr, Bx - fm, Ay);
    cairo_line_to(cr, Dx + fm, Cy);
    cairo_stroke(cr);
@@ -237,7 +237,7 @@ static gboolean bluetooth_indicator_button_press(GtkWidget *widget, GdkEventButt
    g_return_val_if_fail(event != NULL, FALSE);
    bluet = BLUETOOTH_INDICATOR(widget);
 
-   g_signal_emit_by_name(G_OBJECT(bluet), "button-press-event");
+   // g_signal_emit_by_name(G_OBJECT(bluet), "button-press-event");
    return TRUE;
 }
 
