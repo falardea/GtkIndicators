@@ -34,14 +34,19 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="halign">center</property>
+                <property name="halign">start</property>
                 <property name="valign">center</property>
+                <property name="hexpand">True</property>
                 <property name="spacing">10</property>
                 <child>
                   <object class="GtkEntry" id="say_something_entry">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="placeholder-text" translatable="yes">Say Something</property>
+                    <property name="halign">start</property>
+                    <property name="hexpand">True</property>
+                    <property name="max-length">8</property>
+                    <property name="width-chars">8</property>
+                    <property name="placeholder-text" translatable="yes">Say</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -51,7 +56,7 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="do_something_button">
-                    <property name="label" translatable="yes">Do Something</property>
+                    <property name="label" translatable="yes">Do</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="has-focus">True</property>
@@ -86,8 +91,8 @@
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkBox" id="dial_box">
-                        <property name="width-request">200</property>
-                        <property name="height-request">200</property>
+                        <property name="width-request">50</property>
+                        <property name="height-request">50</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
@@ -145,6 +150,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
@@ -161,6 +169,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
@@ -177,6 +188,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">2</property>
@@ -193,6 +207,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
@@ -209,6 +226,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
@@ -225,6 +245,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">2</property>
@@ -241,6 +264,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
@@ -257,6 +283,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
@@ -273,6 +302,9 @@
                         <child>
                           <placeholder/>
                         </child>
+                        <style>
+                          <class name="indicator-content-class"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left-attach">2</property>
@@ -292,9 +324,6 @@
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
@@ -331,8 +360,8 @@
                 <property name="max-content-height">80</property>
                 <child>
                   <object class="GtkTextView" id="msg_out_textview">
-                    <property name="width-request">220</property>
-                    <property name="height-request">40</property>
+                    <property name="width-request">80</property>
+                    <property name="height-request">20</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="hexpand">True</property>

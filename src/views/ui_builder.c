@@ -48,15 +48,15 @@ app_widget_ref_struct *app_builder(void) {
 
    appWidgetsT->w_indicator_box_00 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_00"));
    appWidgetsT->w_indicator_00 = battery_indicator_new();
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_00), appWidgetsT->w_indicator_00, TRUE, TRUE, 10);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_00), appWidgetsT->w_indicator_00, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_01 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_01"));
    appWidgetsT->w_indicator_01 = basic_level_indicator_new();
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_01), appWidgetsT->w_indicator_01, TRUE, TRUE, 10);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_01), appWidgetsT->w_indicator_01, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_02 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_02"));
    appWidgetsT->w_indicator_02 = bluetooth_indicator_new();
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_02), appWidgetsT->w_indicator_02, TRUE, TRUE, 10);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_02), appWidgetsT->w_indicator_02, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_10 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_10"));
    appWidgetsT->w_indicator_box_11 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_11"));

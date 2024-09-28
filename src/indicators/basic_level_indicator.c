@@ -159,17 +159,17 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
 
    int width = gtk_widget_get_allocated_width(widget);
    int height = gtk_widget_get_allocated_height(widget);
-   GtkStyleContext  *context = gtk_widget_get_style_context(widget);
+   // GtkStyleContext  *context = gtk_widget_get_style_context(widget);
    // gtk_render_background(context, cr, 0, 0, width, height);
-   gtk_render_frame(context, cr, 0, 0, width, height);
-   gtk_style_context_add_class(gtk_widget_get_style_context(widget), "basic-level-indicator-class");
+   // gtk_render_frame(context, cr, 0, 0, width, height);
+   gtk_style_context_add_class(gtk_widget_get_style_context(widget), "inner-indicator-class");
 
    int line_width = 1;
    cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
    gboolean vertical_orientation = TRUE;
-   float bm = 1.0f; // base margin
+   float bm = 0.0f; // base margin
    float whr = vertical_orientation ? (3.0f/4.0f) : (4.0f/3.0f); // width-to-height-ratio
    float padx, pady;
 
@@ -179,7 +179,8 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    // Trying to keep an aspect ratio to the indicator
    if (vertical_orientation)
    {
-      if ((float)height <= (( (float)width/whr - ((float)line_width) )))
+      // if ((float)height <= (( (float)width/whr - ((float)line_width) )))
+      if ((indicator_w/indicator_h) >= whr)
       {
          padx = (indicator_w - indicator_h*whr) / 2.0f;
          pady = 0;

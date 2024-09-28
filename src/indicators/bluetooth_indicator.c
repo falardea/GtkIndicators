@@ -165,21 +165,19 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    gtk_render_frame(context, cr, 0, 0, width, height);
    gtk_style_context_add_class(gtk_widget_get_style_context(widget), "bluetooth-indicator-class");
 
-   int line_width = 3;
+   int line_width = 1;
    cairo_set_source_rgba(cr, 0.0, 0.0, 255.0, 1.0);
    cairo_set_line_width(cr, line_width);
-   gboolean vertical_orientation = TRUE;
-   float bm = 1.0f; // base margin
+   float bm = 0.0f; // base margin
    float whr = 3.0f/5.0f; // width-to-height-ratio
    float padx, pady;
 
-   // float indicator_w = (float)width;
-   // float indicator_h = (float)height;
    float indicator_w = (float)width - 2*bm;
    float indicator_h = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   if ((float)height <= (( (float)width/whr - ((float)line_width) )))
+   // if ((float)height <= (( (float)width/whr - ((float)line_width) )))
+   if ((indicator_w/indicator_h) >= whr)
    {
       padx = (indicator_w - indicator_h*whr) / 2.0f;
       pady = 0;
@@ -190,7 +188,8 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
       pady = (indicator_h - indicator_w/whr) / 2.0f;
    }
 
-   float rad = ((float)width/2.0f) - padx - bm;
+   float cl = (float)width/2.0f; // center line x
+   float rad = cl - padx - bm;
    float Ax = padx + bm;
    float Ay = rad + pady + bm;
    float Bx = (float)width - padx - bm;
@@ -199,7 +198,7 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float Cy = (float)height - rad - pady - bm;
    float Dx = Ax;
    float Dy = Cy;
-   float ctx = (float)width/2.0f;
+   float ctx = cl;
    float cty = Ay;
    float cbx = ctx;
    float cby = Cy;
@@ -216,14 +215,19 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_line_to(cr, Ax, Ay);
    cairo_fill(cr);
 
-   float fm = 10.0f;
+   float fm = ( (float)height - 2*pady - 2*bm) * 0.20f;
+   float ih = (float)height - 2*pady - 2*bm - 2*fm; // inner height
+   float hc = (float)height/2.0f; // height center
+
    cairo_set_source_rgba(cr, 255.0, 255, 255.0, 1.0);
-   cairo_move_to(cr, Ax + fm, Ay);
-   cairo_line_to(cr, Cx - fm, Cy);
-   cairo_line_to(cr, ctx, Cy + rad - fm);
-   cairo_line_to(cr, ctx, Ay - rad + fm);
-   cairo_line_to(cr, Bx - fm, Ay);
-   cairo_line_to(cr, Dx + fm, Cy);
+   // Make the line width a factor of the fill margin
+   cairo_set_line_width(cr, fm*0.2);
+   cairo_move_to(cr, cl - (ih/4.0f), hc - (ih/4));
+   cairo_line_to(cr, cl + (ih/4.0f), hc + (ih/4));
+   cairo_line_to(cr, cl, hc + (ih/2.0f));
+   cairo_line_to(cr, cl, hc - (ih/2.0f));
+   cairo_line_to(cr, cl + (ih/4.0f), hc - (ih/4));
+   cairo_line_to(cr, cl - (ih/4.0f), hc + (ih/4));
    cairo_stroke(cr);
 
    return FALSE;

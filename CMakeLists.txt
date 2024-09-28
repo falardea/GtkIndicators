@@ -31,7 +31,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 add_compile_options(${CMAKE_C_FLAGS} -Wall -Wextra -rdynamic)
 add_link_options(-rdynamic)
 
-add_custom_command(OUTPUT ${CSS_OUTFILE} COMMAND sassc -t expanded ${SCSS_SOURCE} ${CSS_OUTFILE})
+# This will force a rebuild of the css by adding a dummy target that doesn't exists
+# Again, that's to the oracles at SO:
+# https://stackoverflow.com/questions/13920072/how-to-always-run-command-when-building-regardless-of-any-dependency
+if(EXISTS ${CMAKE_BINARY_DIR}/__dummy_force_rebuild__.h)
+    message(FATAL_ERROR "File \"${CMAKE_BINARY_DIR}/__dummy_force_rebuild__.h\" found. \
+    And is only there to force css rebuild, delete it!")
+endif ()
+add_custom_target(custom_target_that_always_runs ALL
+                  DEPENDS ${CMAKE_BINARY_DIR}/__dummy_force_rebuild__.h)
+add_custom_command(OUTPUT
+                   ${CMAKE_BINARY_DIR}/__dummy_force_rebuild__.h
+                   ${CSS_OUTFILE}
+                   COMMAND sassc -t expanded ${SCSS_SOURCE} ${CSS_OUTFILE})
 
 # This will build our resource bundle
 # From: https://stackoverflow.com/questions/63697778/how-to-use-glib-compile-resources-with-cmake
