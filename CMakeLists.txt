@@ -90,6 +90,10 @@ set(MY_SOURCES
     src/indicators/basic_level_indicator.h
     src/indicators/bluetooth_indicator.c
     src/indicators/bluetooth_indicator.h
+    src/indicators/puck_indicator.c
+    src/indicators/puck_indicator.h
+    src/views/indicator_layout.c
+    src/views/indicator_layout.h
 )
 
 include_directories(${PROJECT_SOURCE_DIR})

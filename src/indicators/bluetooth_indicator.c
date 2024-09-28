@@ -176,7 +176,6 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float indicator_h = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   // if ((float)height <= (( (float)width/whr - ((float)line_width) )))
    if ((indicator_w/indicator_h) >= whr)
    {
       padx = (indicator_w - indicator_h*whr) / 2.0f;

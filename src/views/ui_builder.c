@@ -10,6 +10,8 @@
 #include "indicators/numeric_label.h"
 #include "indicators/basic_level_indicator.h"
 #include "indicators/bluetooth_indicator.h"
+#include "indicators/puck_indicator.h"
+#include "views/indicator_layout.h"
 
 const double DIAL_INIT_VALUE = 0.0;
 
@@ -17,7 +19,7 @@ gboolean on_component_clicked(__attribute__((unused)) GtkWidget *wdgt, __attribu
 {
    // Weird bug... if the log_level is not set, and this is a debug print, and we don't have a return value...
    // we get a seg fault with an infinite loop.
-   logging_llprintf(LOGLEVEL_DEBUG, "%s", __func__);
+   logging_llprintf(LOGLEVEL_INFO, "%s", __func__);
    return TRUE; // stop propagating the event
 }
 
@@ -63,8 +65,26 @@ app_widget_ref_struct *app_builder(void) {
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_10), appWidgetsT->w_indicator_10, TRUE, TRUE, 1);
 
    appWidgetsT->w_indicator_box_11 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_11"));
+   appWidgetsT->w_indicator_11 = basic_level_indicator_new(FALSE);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_11), appWidgetsT->w_indicator_11, TRUE, TRUE, 1);
+
    appWidgetsT->w_indicator_box_12 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_12"));
+   appWidgetsT->w_indicator_12 = basic_level_indicator_new(FALSE);
+   gtk_widget_set_hexpand(appWidgetsT->w_indicator_12, TRUE);
+   gtk_widget_set_vexpand(appWidgetsT->w_indicator_12, TRUE);
+   gtk_widget_set_margin_start(appWidgetsT->w_indicator_12, 5);
+   gtk_widget_set_margin_top(appWidgetsT->w_indicator_12, 5);
+   gtk_widget_set_margin_end(appWidgetsT->w_indicator_12, 5);
+   gtk_widget_set_margin_bottom(appWidgetsT->w_indicator_12, 5);
+   gtk_grid_attach(GTK_GRID(appWidgetsT->w_indicator_box_12), appWidgetsT->w_indicator_12, 0, 0, 1, 1);
+
    appWidgetsT->w_indicator_box_20 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_20"));
+   IndicatorLayout *puck_layout = g_new(IndicatorLayout, 1);
+   puck_layout = indicator_layout_set(puck_layout, TRUE, TRUE, 3, 3, 3, 3);
+   appWidgetsT->w_indicator_20 = puck_indicator_new(puck_layout,TRUE);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_20), appWidgetsT->w_indicator_20, TRUE, TRUE, 1);
+   indicator_layout_free(puck_layout);
+
    appWidgetsT->w_indicator_box_21 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_21"));
    appWidgetsT->w_indicator_box_22 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_22"));
 
@@ -72,6 +92,10 @@ app_widget_ref_struct *app_builder(void) {
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_00, "value", G_BINDING_DEFAULT);
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_01, "value", G_BINDING_DEFAULT);
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_10, "value", G_BINDING_DEFAULT);
+   g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_11, "value", G_BINDING_DEFAULT);
+   g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_12, "value", G_BINDING_DEFAULT);
+   g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_20, "value", G_BINDING_DEFAULT);
+
 
    gtk_builder_connect_signals(builder, appWidgetsT);
 
@@ -81,6 +105,12 @@ app_widget_ref_struct *app_builder(void) {
                      G_CALLBACK(on_component_clicked), appWidgetsT);
    g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_10), "button-press-event",
                      G_CALLBACK(on_component_clicked), appWidgetsT);
+   g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_11), "button-press-event",
+                     G_CALLBACK(on_component_clicked), appWidgetsT);
+   g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_12), "button-press-event",
+                     G_CALLBACK(on_component_clicked), appWidgetsT);
+   g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_20), "button-press-event",
+                     G_CALLBACK(on_component_clicked), appWidgetsT);
 
    // It appears the composite/custom widgets with templates are loaded and show, where these
    // seem to need explicit exposure.
@@ -89,6 +119,9 @@ app_widget_ref_struct *app_builder(void) {
    gtk_widget_show(appWidgetsT->w_indicator_01);
    gtk_widget_show(appWidgetsT->w_indicator_02);
    gtk_widget_show(appWidgetsT->w_indicator_10);
+   gtk_widget_show(appWidgetsT->w_indicator_11);
+   gtk_widget_show(appWidgetsT->w_indicator_12);
+   gtk_widget_show(appWidgetsT->w_indicator_20);
 
    g_object_unref(builder);
    return appWidgetsT;

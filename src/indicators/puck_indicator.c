@@ -1,14 +1,15 @@
 /**
- * Created by french on 9/22/24.
+ * Created by french on 9/28/24.
+ * @brief
  */
 #include <math.h>
 #include <cairo/cairo.h>
 #include <glib-object.h>
-#include "basic_level_indicator.h"
+#include "puck_indicator.h"
 
 #include "utils/logging.h"
 
-struct _BasicLevelIndicator
+struct _PuckIndicator
 {
    GtkWidget            parent;
    gdouble              value;         // the percent charge
@@ -19,107 +20,113 @@ struct _BasicLevelIndicator
 // It appears that anything that isn't defined as a property is effectively private instance data?
 enum {
    PROP_0,
-   BASIC_LEVEL_INDICATOR_VALUE_PROP,
-   N_BASIC_LEVEL_INDICATOR_PROPERTIES
+   PUCK_INDICATOR_VALUE_PROP,
+   N_PUCK_INDICATOR_PROPERTIES
 };
 
-G_DEFINE_TYPE(BasicLevelIndicator, basic_level_indicator, GTK_TYPE_WIDGET)
+G_DEFINE_TYPE(PuckIndicator, puck_indicator, GTK_TYPE_WIDGET)
 
-static void       basic_level_indicator_realize                 (GtkWidget *widget);
-static void       basic_level_indicator_size_allocate           (GtkWidget *widget,
-                                                             GtkAllocation *allocation);
-static gboolean   basic_level_indicator_draw                    (GtkWidget *widget,
-                                                             cairo_t *cr);
-static gboolean   basic_level_indicator_button_press            (GtkWidget *widget,
-                                                             GdkEventButton *event);
-static void basic_level_indicator_set_property( GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
+static void       puck_indicator_realize                 (GtkWidget *widget);
+static void       puck_indicator_size_allocate           (GtkWidget *widget,
+                                                          GtkAllocation *allocation);
+static gboolean   puck_indicator_draw                    (GtkWidget *widget,
+                                                          cairo_t *cr);
+static gboolean   puck_indicator_button_press            (GtkWidget *widget,
+                                                          GdkEventButton *event);
+static void puck_indicator_set_property( GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
-   BasicLevelIndicator *self = (BasicLevelIndicator *) object;
+   PuckIndicator *self = (PuckIndicator *) object;
    switch (prop_id)
    {
-      case BASIC_LEVEL_INDICATOR_VALUE_PROP:
-         basic_level_indicator_set_value(self, g_value_get_double( value ));
+      case PUCK_INDICATOR_VALUE_PROP:
+         puck_indicator_set_value(self, g_value_get_double( value ));
          break;
       default:
          G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
    }
 }
 
-static void basic_level_indicator_get_property( GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
+static void puck_indicator_get_property( GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
 {
-   BasicLevelIndicator *self = (BasicLevelIndicator *) object;
+   PuckIndicator *self = (PuckIndicator *) object;
 
    switch (prop_id)
    {
-      case BASIC_LEVEL_INDICATOR_VALUE_PROP:
-         g_value_set_double(value, basic_level_indicator_get_value(self));
+      case PUCK_INDICATOR_VALUE_PROP:
+         g_value_set_double(value, puck_indicator_get_value(self));
          break;
       default:
          G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
    }
 }
 
-static GParamSpec *basic_level_indicator_properties[N_BASIC_LEVEL_INDICATOR_PROPERTIES] = {NULL, };
+static GParamSpec *puck_indicator_properties[N_PUCK_INDICATOR_PROPERTIES] = {NULL, };
 
-static void basic_level_indicator_class_init(BasicLevelIndicatorClass *klass)
+static void puck_indicator_class_init(PuckIndicatorClass *klass)
 {
    logging_llprintf(LOGLEVEL_DEBUG, "%s", __func__);
    GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
    GtkWidgetClass *widget_class = (GtkWidgetClass *) klass;
 
-   widget_class->button_press_event = basic_level_indicator_button_press;
-   widget_class->realize = basic_level_indicator_realize;
-   widget_class->draw = basic_level_indicator_draw;
-   widget_class->size_allocate = basic_level_indicator_size_allocate;
+   widget_class->button_press_event = puck_indicator_button_press;
+   widget_class->realize = puck_indicator_realize;
+   widget_class->draw = puck_indicator_draw;
+   widget_class->size_allocate = puck_indicator_size_allocate;
 
-   object_class->set_property = basic_level_indicator_set_property;
-   object_class->get_property = basic_level_indicator_get_property;
-   basic_level_indicator_properties[BASIC_LEVEL_INDICATOR_VALUE_PROP] = g_param_spec_double("value", NULL, NULL,
-                                                                                    -G_MINDOUBLE, G_MAXDOUBLE,
-                                                                                    0, G_PARAM_READWRITE);
-   g_object_class_install_properties(object_class, N_BASIC_LEVEL_INDICATOR_PROPERTIES, basic_level_indicator_properties);
+   object_class->set_property = puck_indicator_set_property;
+   object_class->get_property = puck_indicator_get_property;
+   puck_indicator_properties[PUCK_INDICATOR_VALUE_PROP] = g_param_spec_double("value", NULL, NULL,
+                                                                                            -G_MINDOUBLE, G_MAXDOUBLE,
+                                                                                            0, G_PARAM_READWRITE);
+   g_object_class_install_properties(object_class, N_PUCK_INDICATOR_PROPERTIES, puck_indicator_properties);
 }
 
 //// Instance ////////////
-static void basic_level_indicator_init(BasicLevelIndicator *bli)
+static void puck_indicator_init(PuckIndicator *pi)
 {
-   bli->value = 0.0;
-   bli->old_value = 0.0;
+   pi->value = 0.0;
+   pi->old_value = 0.0;
 }
 
-GtkWidget *basic_level_indicator_new(gboolean vertical)
+GtkWidget *puck_indicator_new(IndicatorLayout *layout,gboolean vertical)
 {
-   BasicLevelIndicator *bli = g_object_new(basic_level_indicator_get_type(), NULL);
-   bli->vertical_orientation = vertical;
+   PuckIndicator *pi = g_object_new(puck_indicator_get_type(), NULL);
+   pi->vertical_orientation = vertical;
+   gtk_widget_set_hexpand(GTK_WIDGET(pi), layout->h_expand);
+   gtk_widget_set_vexpand(GTK_WIDGET(pi), layout->v_expand);
+   gtk_widget_set_margin_start(GTK_WIDGET(pi), layout->start);
+   gtk_widget_set_margin_top(GTK_WIDGET(pi), layout->top);
+   gtk_widget_set_margin_end(GTK_WIDGET(pi), layout->end);
+   gtk_widget_set_margin_bottom(GTK_WIDGET(pi), layout->bottom);
 
-   return GTK_WIDGET(bli);
+   return GTK_WIDGET(pi);
 }
 
-gdouble basic_level_indicator_get_value(BasicLevelIndicator *bli)
+gdouble puck_indicator_get_value(PuckIndicator *pi)
 {
-   g_return_val_if_fail(BASIC_LEVEL_IS_INDICATOR(bli), 0.0);
-   return bli->value;
+   g_return_val_if_fail(PUCK_IS_INDICATOR(pi), 0.0);
+   return pi->value;
 }
 
-void basic_level_indicator_set_value(BasicLevelIndicator *bli, gdouble new_value)
+void puck_indicator_set_value(PuckIndicator *pi, gdouble new_value)
 {
-   g_return_if_fail(BASIC_LEVEL_IS_INDICATOR(bli));
-   bli->old_value = bli->value;
-   bli->value = new_value;
+   g_return_if_fail(PUCK_IS_INDICATOR(pi));
+   pi->old_value = pi->value;
+   pi->value = new_value;
 
-   gtk_widget_queue_draw(GTK_WIDGET(bli));
-//   g_object_notify_by_pspec(G_OBJECT(bli), basic_level_indicator_properties[BASIC_LEVEL_INDICATOR_VALUE_PROP]);
+   gtk_widget_queue_draw(GTK_WIDGET(pi));
+//   g_object_notify_by_pspec(G_OBJECT(pi), puck_indicator_properties[PUCK_INDICATOR_VALUE_PROP]);
 }
 
-static void basic_level_indicator_realize(GtkWidget *widget)
+static void puck_indicator_realize(GtkWidget *widget)
 {
    GdkWindowAttr  win_attr;
    GtkAllocation  alloc;
    gint           attr_mask;
 
    g_return_if_fail(widget != NULL);
-   g_return_if_fail(BASIC_LEVEL_IS_INDICATOR(widget));
+   g_return_if_fail(PUCK_IS_INDICATOR(widget));
 
    gtk_widget_set_realized(widget, TRUE);
    gtk_widget_get_allocation(widget, &alloc);
@@ -137,11 +144,11 @@ static void basic_level_indicator_realize(GtkWidget *widget)
    gdk_window_set_user_data(gtk_widget_get_window(widget), widget);
 }
 
-static void basic_level_indicator_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
+static void puck_indicator_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 {
-//   BasicLevelIndicator *bli;
+//   PuckIndicator *pi;
    g_return_if_fail(widget != NULL);
-   g_return_if_fail(BASIC_LEVEL_IS_INDICATOR(widget));
+   g_return_if_fail(PUCK_IS_INDICATOR(widget));
    g_return_if_fail(allocation != NULL);
 
    gtk_widget_set_allocation(widget, allocation);
@@ -154,11 +161,11 @@ static void basic_level_indicator_size_allocate(GtkWidget *widget, GtkAllocation
    }
 }
 
-static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
+static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
 {
-   BasicLevelIndicator *bli = BASIC_LEVEL_INDICATOR(widget);
+   PuckIndicator *pi = PUCK_INDICATOR(widget);
    g_return_val_if_fail(widget != NULL, FALSE);
-   g_return_val_if_fail(BASIC_LEVEL_IS_INDICATOR(widget), FALSE);
+   g_return_val_if_fail(PUCK_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(cr != NULL, FALSE);
 
    int width = gtk_widget_get_allocated_width(widget);
@@ -173,15 +180,15 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_line_width(cr, line_width);
 
    float bm = 0.0f; // base margin
-   float whr = bli->vertical_orientation ? (3.0f/4.0f) : (4.0f/3.0f); // width-to-height-ratio
+   float whr = 1.0f; // width-to-height-ratio
    float padx, pady;
 
    float indicator_w = (float)width - 2*bm;
    float indicator_h = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   if (((bli->vertical_orientation) && ((indicator_w/indicator_h) >= whr)) ||
-      (!(bli->vertical_orientation) && ((indicator_h/indicator_w) <= 1.0f/whr)))
+   if (((pi->vertical_orientation) && ((indicator_w/indicator_h) >= whr)) ||
+       (!(pi->vertical_orientation) && ((indicator_h/indicator_w) <= 1.0f/whr)))
    {
       padx = (indicator_w - indicator_h*whr) / 2.0f;
       pady = 0;
@@ -220,9 +227,9 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    Gy = body_bottom - fm;
    Hx = Ex;
    Hy = Gy;
-   if (bli->vertical_orientation)
+   if (pi->vertical_orientation)
    {
-      fl = fh * (float)(bli->value/100.0f);
+      fl = fh * (float)(pi->value/100.0f);
       Ix = Ex;
       Iy = Hy - fl;
       Jx = Fx;
@@ -236,7 +243,7 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    }
    else
    {
-      fl = fw * (float)(bli->value/100.0f);
+      fl = fw * (float)(pi->value/100.0f);
       Ix = Ex + fl;
       Iy = Ey;
       Jx = Hx + fl;
@@ -249,19 +256,20 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
       cairo_fill(cr);
 
    }
+
    return FALSE;
 }
 
-static gboolean basic_level_indicator_button_press(GtkWidget *widget, GdkEventButton *event)
+static gboolean puck_indicator_button_press(GtkWidget *widget, GdkEventButton *event)
 {
-   BasicLevelIndicator *bli;
+   PuckIndicator *pi;
    g_return_val_if_fail(widget != NULL, FALSE);
-   g_return_val_if_fail(BASIC_LEVEL_IS_INDICATOR(widget), FALSE);
+   g_return_val_if_fail(PUCK_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(event != NULL, FALSE);
-   bli = BASIC_LEVEL_INDICATOR(widget);
+   pi = PUCK_INDICATOR(widget);
 
    logging_llprintf(LOGLEVEL_DEBUG, "%s", __func__ );
-   g_signal_emit_by_name(G_OBJECT(bli), "button-press-event");
+   g_signal_emit_by_name(G_OBJECT(pi), "button-press-event");
    return TRUE;
 }
 
