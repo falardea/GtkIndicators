@@ -12,7 +12,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE(BasicLevelIndicator, basic_level_indicator, BASIC_LEVEL, INDICATOR, GtkWidget)
 
-GtkWidget *basic_level_indicator_new(void);
+GtkWidget *basic_level_indicator_new(gboolean vertical);
 
 gdouble basic_level_indicator_get_value(BasicLevelIndicator *self);
 void basic_level_indicator_set_value(BasicLevelIndicator *self, gdouble new_value);

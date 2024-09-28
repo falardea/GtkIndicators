@@ -51,7 +51,7 @@ app_widget_ref_struct *app_builder(void) {
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_00), appWidgetsT->w_indicator_00, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_01 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_01"));
-   appWidgetsT->w_indicator_01 = basic_level_indicator_new();
+   appWidgetsT->w_indicator_01 = basic_level_indicator_new(TRUE);
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_01), appWidgetsT->w_indicator_01, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_02 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_02"));
@@ -59,6 +59,9 @@ app_widget_ref_struct *app_builder(void) {
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_02), appWidgetsT->w_indicator_02, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_10 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_10"));
+   appWidgetsT->w_indicator_10 = basic_level_indicator_new(FALSE);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_10), appWidgetsT->w_indicator_10, TRUE, TRUE, 1);
+
    appWidgetsT->w_indicator_box_11 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_11"));
    appWidgetsT->w_indicator_box_12 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_12"));
    appWidgetsT->w_indicator_box_20 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_20"));
@@ -68,12 +71,15 @@ app_widget_ref_struct *app_builder(void) {
    g_object_bind_property(appWidgetsT->w_dial, "old_value", appWidgetsT->w_dial_label, "value", G_BINDING_DEFAULT);
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_00, "value", G_BINDING_DEFAULT);
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_01, "value", G_BINDING_DEFAULT);
+   g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_10, "value", G_BINDING_DEFAULT);
 
    gtk_builder_connect_signals(builder, appWidgetsT);
 
    g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_00), "button-press-event",
                      G_CALLBACK(on_component_clicked), appWidgetsT);
    g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_01), "button-press-event",
+                     G_CALLBACK(on_component_clicked), appWidgetsT);
+   g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_10), "button-press-event",
                      G_CALLBACK(on_component_clicked), appWidgetsT);
 
    // It appears the composite/custom widgets with templates are loaded and show, where these
@@ -82,6 +88,7 @@ app_widget_ref_struct *app_builder(void) {
    gtk_widget_show(appWidgetsT->w_indicator_00);
    gtk_widget_show(appWidgetsT->w_indicator_01);
    gtk_widget_show(appWidgetsT->w_indicator_02);
+   gtk_widget_show(appWidgetsT->w_indicator_10);
 
    g_object_unref(builder);
    return appWidgetsT;

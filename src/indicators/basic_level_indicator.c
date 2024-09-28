@@ -13,6 +13,7 @@ struct _BasicLevelIndicator
    GtkWidget            parent;
    gdouble              value;         // the percent charge
    gdouble              old_value;     // to determine change?
+   gboolean             vertical_orientation;
 };
 
 // It appears that anything that isn't defined as a property is effectively private instance data?
@@ -87,9 +88,11 @@ static void basic_level_indicator_init(BasicLevelIndicator *bli)
    bli->old_value = 0.0;
 }
 
-GtkWidget *basic_level_indicator_new(void)
+GtkWidget *basic_level_indicator_new(gboolean vertical)
 {
-   return g_object_new(basic_level_indicator_get_type(), NULL);
+   BasicLevelIndicator *bli = g_object_new(basic_level_indicator_get_type(), NULL);
+   bli->vertical_orientation = vertical;
+   return GTK_WIDGET(bli);
 }
 
 gdouble basic_level_indicator_get_value(BasicLevelIndicator *bli)
@@ -168,16 +171,15 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
-   gboolean vertical_orientation = TRUE;
    float bm = 0.0f; // base margin
-   float whr = vertical_orientation ? (3.0f/4.0f) : (4.0f/3.0f); // width-to-height-ratio
+   float whr = bli->vertical_orientation ? (3.0f/4.0f) : (4.0f/3.0f); // width-to-height-ratio
    float padx, pady;
 
    float indicator_w = (float)width - 2*bm;
    float indicator_h = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   if (vertical_orientation)
+   if (bli->vertical_orientation)
    {
       // if ((float)height <= (( (float)width/whr - ((float)line_width) )))
       if ((indicator_w/indicator_h) >= whr)
@@ -193,7 +195,8 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    }
    else
    {
-      if ( (((float)height - ((float)line_width/2)) * whr) >= ((float)width ) )
+      // if ( (((float)height - ((float)line_width/2)) * whr) >= ((float)width ) )
+      if ((indicator_h/indicator_w) >= 1.0f/whr)
       {
          padx = 0;
          pady = (indicator_h - indicator_w/whr) / 2.0f;
@@ -248,7 +251,7 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    Gy = Cy - fm;
    Hx = Ex;
    Hy = Gy;
-   if (vertical_orientation)
+   if (bli->vertical_orientation)
    {
       fl = fh * (float)(bli->value/100.0f);
       Ix = Ex;
