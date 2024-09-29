@@ -206,8 +206,8 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_source_rgba(cr, 0, 0, 0, 1.0);
    cairo_set_line_width(cr, line_width);
    float offset, puck_radius, top_span, offset_pct,  top_span_pct;
-   offset_pct = 0.05f;
-   top_span_pct = 0.4f;
+   offset_pct = 0.25f;
+   top_span_pct = 0.6f;
    if (pi->vertical_orientation)
    {
       offset = (offset_pct * (body_bottom - body_top));
@@ -222,7 +222,7 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       cairo_line_to(cr, (width/2) + (top_span/2), body_top);
       cairo_line_to(cr, (width/2) + (top_span/2), (body_bottom - puck_radius - arc_offset));
       // read cairo docs, positive angle is clockwise
-      cairo_arc(cr, (width/2), (body_bottom - puck_radius), puck_radius, (3*M_PI/2)-in_ang, (3*M_PI/2)+in_ang);
+      cairo_arc_negative(cr, (width/2), (body_bottom - puck_radius), puck_radius, (3*M_PI/2)+in_ang, (3*M_PI/2)-in_ang);
       cairo_fill(cr);
 
       // body
