@@ -205,21 +205,52 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
 
    cairo_set_source_rgba(cr, 0, 0, 0, 1.0);
    cairo_set_line_width(cr, line_width);
-   float offset;
-   float puck_radius;
+   float offset, puck_radius, top_span, offset_pct,  top_span_pct;
+   offset_pct = 0.05f;
+   top_span_pct = 0.4f;
    if (pi->vertical_orientation)
    {
-      offset = (0.10f * (body_bottom - body_top));
+      offset = (offset_pct * (body_bottom - body_top));
       puck_radius = (body_bottom - (height/2) - offset);
+      top_span = top_span_pct * (2*puck_radius);
+
+      // top
+      float arc_offset = sqrtf(powf(puck_radius,2) - powf((top_span/2),2));
+      float in_ang = sinf((top_span/2) / puck_radius);
+      cairo_move_to(cr, (width/2) - (top_span/2), (body_bottom - puck_radius - arc_offset));
+      cairo_line_to(cr, (width/2) - (top_span/2), body_top);
+      cairo_line_to(cr, (width/2) + (top_span/2), body_top);
+      cairo_line_to(cr, (width/2) + (top_span/2), (body_bottom - puck_radius - arc_offset));
+      // read cairo docs, positive angle is clockwise
+      cairo_arc(cr, (width/2), (body_bottom - puck_radius), puck_radius, (3*M_PI/2)-in_ang, (3*M_PI/2)+in_ang);
+      cairo_fill(cr);
+
+      // body
       cairo_arc(cr, width/2, ((height/2) + offset), puck_radius, 0, 2*M_PI);
+      cairo_stroke(cr);
    }
    else
    {
-      offset = (0.10f * (body_right - body_left));
+      offset = (offset_pct * (body_right - body_left));
       puck_radius = (body_right - (width/2) - offset);
+      top_span = top_span_pct * (2*puck_radius);
+
+      // top
+      float arc_offset = sqrtf(powf(puck_radius,2) - powf((top_span/2),2));
+      float in_ang = sinf((top_span/2) / puck_radius);
+      cairo_move_to(cr, (body_left + puck_radius + arc_offset), ((height/2) - (top_span/2)));
+      cairo_line_to(cr, body_right, ((height/2) - (top_span/2)));
+      cairo_line_to(cr, body_right, ((height/2) + (top_span/2)));
+      cairo_line_to(cr, (body_left + puck_radius + arc_offset), ((height/2) + (top_span/2)));
+      // read cairo docs, positive angle is clockwise
+      cairo_arc_negative(cr, (body_left + puck_radius), (height/2), puck_radius, in_ang, -1*in_ang);
+      cairo_fill(cr);
+
+      // body
       cairo_arc(cr, ((width/2) - offset), height/2, puck_radius, 0, 2*M_PI);
+      cairo_stroke(cr);
    }
-   cairo_stroke(cr);
+
 
    // The filling
    // float fm = line_width;  // filler-margin
