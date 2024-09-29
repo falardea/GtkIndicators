@@ -206,7 +206,7 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_source_rgba(cr, 0, 0, 0, 1.0);
    cairo_set_line_width(cr, line_width);
    float offset, puck_radius, top_span, offset_pct,  top_span_pct;
-   offset_pct = 0.25f;
+   offset_pct = 0.0f;
    top_span_pct = 0.6f;
    if (pi->vertical_orientation)
    {
@@ -218,8 +218,8 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       float arc_offset = sqrtf(powf(puck_radius,2) - powf((top_span/2),2));
       float in_ang = sinf((top_span/2) / puck_radius);
       cairo_move_to(cr, (width/2) - (top_span/2), (body_bottom - puck_radius - arc_offset));
-      cairo_line_to(cr, (width/2) - (top_span/2), body_top);
-      cairo_line_to(cr, (width/2) + (top_span/2), body_top);
+      cairo_line_to(cr, (width/2) - (top_span/2), body_top-(line_width/2));
+      cairo_line_to(cr, (width/2) + (top_span/2), body_top-(line_width/2));
       cairo_line_to(cr, (width/2) + (top_span/2), (body_bottom - puck_radius - arc_offset));
       // read cairo docs, positive angle is clockwise
       cairo_arc_negative(cr, (width/2), (body_bottom - puck_radius), puck_radius, (3*M_PI/2)+in_ang, (3*M_PI/2)-in_ang);
@@ -239,8 +239,8 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       float arc_offset = sqrtf(powf(puck_radius,2) - powf((top_span/2),2));
       float in_ang = sinf((top_span/2) / puck_radius);
       cairo_move_to(cr, (body_left + puck_radius + arc_offset), ((height/2) - (top_span/2)));
-      cairo_line_to(cr, body_right, ((height/2) - (top_span/2)));
-      cairo_line_to(cr, body_right, ((height/2) + (top_span/2)));
+      cairo_line_to(cr, body_right+(line_width/2), ((height/2) - (top_span/2)));
+      cairo_line_to(cr, body_right+(line_width/2), ((height/2) + (top_span/2)));
       cairo_line_to(cr, (body_left + puck_radius + arc_offset), ((height/2) + (top_span/2)));
       // read cairo docs, positive angle is clockwise
       cairo_arc_negative(cr, (body_left + puck_radius), (height/2), puck_radius, in_ang, -1*in_ang);
