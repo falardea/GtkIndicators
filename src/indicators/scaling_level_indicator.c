@@ -89,11 +89,16 @@ static void scaling_level_indicator_init(ScalingLevelIndicator *sli)
    sli->old_value = 0.0;
 }
 
-GtkWidget *scaling_level_indicator_new(gboolean vertical)
+GtkWidget *scaling_level_indicator_new(IndicatorLayout *layout, gboolean vertical)
 {
    ScalingLevelIndicator *sli = g_object_new(scaling_level_indicator_get_type(), NULL);
    sli->vertical_orientation = vertical;
-
+   gtk_widget_set_hexpand(GTK_WIDGET(sli), layout->h_expand);
+   gtk_widget_set_vexpand(GTK_WIDGET(sli), layout->v_expand);
+   gtk_widget_set_margin_start(GTK_WIDGET(sli), layout->start);
+   gtk_widget_set_margin_top(GTK_WIDGET(sli), layout->top);
+   gtk_widget_set_margin_end(GTK_WIDGET(sli), layout->end);
+   gtk_widget_set_margin_bottom(GTK_WIDGET(sli), layout->bottom);
    return GTK_WIDGET(sli);
 }
 
@@ -175,7 +180,7 @@ static gboolean scaling_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
 
    float w_marg = width - 2*bm;
    float h_marg = height - 2*bm;
-   float line_width;
+
    // Trying to keep an aspect ratio to the indicator
    if (((sli->vertical_orientation) && ((w_marg/h_marg) >= whr)) ||
        (!(sli->vertical_orientation) && ((h_marg/w_marg) <= 1.0f/whr)))
@@ -190,7 +195,7 @@ static gboolean scaling_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    }
 
    // Make the line width proportional to the hypotenuse of the indicator content area
-   line_width = 0.04f * sqrtf(powf((w_marg - 2*padx),2) + powf((h_marg- 2*pady),2));
+   float line_width = 0.04f * sqrtf(powf((w_marg - 2*padx),2) + powf((h_marg- 2*pady),2));
 
    float body_left = padx + 0.5f*(width - w_marg + line_width);
    float body_top = pady + 0.5f*(height - h_marg + line_width);

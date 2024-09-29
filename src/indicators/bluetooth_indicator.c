@@ -158,23 +158,23 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    g_return_val_if_fail(BLUETOOTH_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(cr != NULL, FALSE);
 
-   int width = gtk_widget_get_allocated_width(widget);
-   int height = gtk_widget_get_allocated_height(widget);
+   float width = (float)gtk_widget_get_allocated_width(widget);
+   float height = (float)gtk_widget_get_allocated_height(widget);
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
    gtk_style_context_add_class(context, "bluetooth-indicator-class");
    gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
 
 
-   int line_width = 1;
+   float line_width = 1;
    cairo_set_source_rgba(cr, 0.0, 0.0, 255.0, 1.0);
    cairo_set_line_width(cr, line_width);
    float bm = 0.0f; // base margin
    float whr = 3.0f/5.0f; // width-to-height-ratio
    float padx, pady;
 
-   float w_marg = (float)width - 2*bm;
-   float h_marg = (float)height - 2*bm;
+   float w_marg = width - 2*bm;
+   float h_marg = height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
    if ((w_marg/h_marg) >= whr)
@@ -188,12 +188,12 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
       pady = (h_marg - w_marg/whr) / 2.0f;
    }
 
-   float cl = (float)width/2.0f; // center line x
+   float cl = width/2.0f; // center line x
    float rad = cl - padx - bm;
    float body_left = padx + bm;
    float block_top = rad + pady + bm;
-   float body_right = (float)width - padx - bm;
-   float block_bottom = (float)height - rad - pady - bm;
+   float body_right = width - padx - bm;
+   float block_bottom = height - rad - pady - bm;
    float ctx = cl;
    float cty = block_top;
    float cbx = ctx;
@@ -211,9 +211,9 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_line_to(cr, body_left, block_top);
    cairo_fill(cr);
 
-   float fm = ( (float)height - 2*pady - 2*bm) * 0.20f;
-   float ih = (float)height - 2*pady - 2*bm - 2*fm; // inner height
-   float hc = (float)height/2.0f; // height center
+   float fm = (height - 2*pady - 2*bm) * 0.20f;
+   float ih = height - 2*pady - 2*bm - 2*fm; // inner height
+   float hc = height/2.0f; // height center
 
    cairo_set_source_rgba(cr, 255.0, 255, 255.0, 1.0);
    // Make the line width a factor of the fill margin

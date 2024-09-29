@@ -89,7 +89,7 @@ static void puck_indicator_init(PuckIndicator *pi)
    pi->old_value = 0.0;
 }
 
-GtkWidget *puck_indicator_new(IndicatorLayout *layout,gboolean vertical)
+GtkWidget *puck_indicator_new(IndicatorLayout *layout, gboolean vertical)
 {
    PuckIndicator *pi = g_object_new(puck_indicator_get_type(), NULL);
    pi->vertical_orientation = vertical;
@@ -168,23 +168,19 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
    g_return_val_if_fail(PUCK_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(cr != NULL, FALSE);
 
-   int width = gtk_widget_get_allocated_width(widget);
-   int height = gtk_widget_get_allocated_height(widget);
+   float width = (float)gtk_widget_get_allocated_width(widget);
+   float height = (float)gtk_widget_get_allocated_height(widget);
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
    gtk_style_context_add_class(context, "inner-indicator-class");
    gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
 
-   int line_width = 1;
-   cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
-   cairo_set_line_width(cr, line_width);
-
    float bm = 0.0f; // base margin
    float whr = 1.0f; // width-to-height-ratio
    float padx, pady;
 
-   float w_marg = (float)width - 2*bm;
-   float h_marg = (float)height - 2*bm;
+   float w_marg = width - 2*bm;
+   float h_marg = height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
    if (((pi->vertical_orientation) && ((w_marg/h_marg) >= whr)) ||
@@ -199,47 +195,60 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       pady = (h_marg - w_marg/whr) / 2.0f;
    }
 
-   float body_left = 0 + bm + padx;
-   float body_top = 0 + bm + pady;
-   float body_right = (float)width - bm - padx;
-   float body_bottom = (float)height - bm - pady;
+   // Make the line width proportional to the hypotenuse of the indicator content area
+   float line_width = 0.04f * sqrtf(powf((w_marg - 2*padx),2) + powf((h_marg- 2*pady),2));
 
-   cairo_move_to(cr, body_left,body_top);
-   cairo_line_to(cr, body_right,body_top);
-   cairo_line_to(cr, body_right,body_bottom);
-   cairo_line_to(cr, body_left,body_bottom);
-   // Subtracting 1/2 the line width on the closing height to make sure it closes properly
-   cairo_line_to(cr, body_left,body_top - (float)line_width/2);
-   cairo_stroke(cr);
+   float body_left = padx + 0.5f*(width - w_marg + line_width);
+   float body_top = pady + 0.5f*(height - h_marg + line_width);
+   float body_right = 0.5f*(width + w_marg - line_width) - padx;
+   float body_bottom = 0.5f*(height + h_marg - line_width) - pady;
 
-   // The "level"
-   float fm = line_width;  // filler-margin
-   float fl; // fill-level
-
-   float fill_left = body_left + fm;
-   float fill_top = body_top + fm;
-   float fill_right = body_right - fm;
-   float fill_bottom = body_bottom - fm;
+   cairo_set_source_rgba(cr, 0, 0, 0, 1.0);
+   cairo_set_line_width(cr, line_width);
+   float offset;
+   float puck_radius;
    if (pi->vertical_orientation)
    {
-      fl = ((body_bottom-body_top) - 2.0f*fm) * (float)(pi->value/100.0f);
-      cairo_move_to(cr, fill_left, fill_bottom - fl);
-      cairo_line_to(cr, fill_right, fill_bottom - fl);
-      cairo_line_to(cr, fill_right, fill_bottom);
-      cairo_line_to(cr, fill_left, fill_bottom);
-      cairo_line_to(cr, fill_left, fill_bottom - fl);
-      cairo_fill(cr);
+      offset = (0.10f * (body_bottom - body_top));
+      puck_radius = (body_bottom - (height/2) - offset);
+      cairo_arc(cr, width/2, ((height/2) + offset), puck_radius, 0, 2*M_PI);
    }
    else
    {
-      fl = ((body_right-body_left) - 2.0f*fm) * (float)(pi->value/100.0f);
-      cairo_move_to(cr, fill_left, fill_top);
-      cairo_line_to(cr, fill_left + fl, fill_top);
-      cairo_line_to(cr, fill_left + fl, fill_bottom);
-      cairo_line_to(cr, fill_left, fill_bottom);
-      cairo_line_to(cr, fill_left, fill_top);
-      cairo_fill(cr);
+      offset = (0.10f * (body_right - body_left));
+      puck_radius = (body_right - (width/2) - offset);
+      cairo_arc(cr, ((width/2) - offset), height/2, puck_radius, 0, 2*M_PI);
    }
+   cairo_stroke(cr);
+
+   // The filling
+   // float fm = line_width;  // filler-margin
+   // float fl; // fill-level
+   //
+   // float fill_left = body_left + fm;
+   // float fill_top = body_top + fm;
+   // float fill_right = body_right - fm;
+   // float fill_bottom = body_bottom - fm;
+   // if (pi->vertical_orientation)
+   // {
+   //    fl = ((body_bottom-body_top) - 2.0f*fm) * (float)(pi->value/100.0f);
+   //    cairo_move_to(cr, fill_left, fill_bottom - fl);
+   //    cairo_line_to(cr, fill_right, fill_bottom - fl);
+   //    cairo_line_to(cr, fill_right, fill_bottom);
+   //    cairo_line_to(cr, fill_left, fill_bottom);
+   //    cairo_line_to(cr, fill_left, fill_bottom - fl);
+   //    cairo_fill(cr);
+   // }
+   // else
+   // {
+   //    fl = ((body_right-body_left) - 2.0f*fm) * (float)(pi->value/100.0f);
+   //    cairo_move_to(cr, fill_left, fill_top);
+   //    cairo_line_to(cr, fill_left + fl, fill_top);
+   //    cairo_line_to(cr, fill_left + fl, fill_bottom);
+   //    cairo_line_to(cr, fill_left, fill_bottom);
+   //    cairo_line_to(cr, fill_left, fill_top);
+   //    cairo_fill(cr);
+   // }
 
    return FALSE;
 }

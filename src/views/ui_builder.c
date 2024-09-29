@@ -12,6 +12,7 @@
 #include "indicators/bluetooth_indicator.h"
 #include "indicators/puck_indicator.h"
 #include "indicators/scaling_level_indicator.h"
+#include "indicators/tank_indicator.h"
 #include "views/indicator_layout.h"
 
 const double DIAL_INIT_VALUE = 0.0;
@@ -62,12 +63,18 @@ app_widget_ref_struct *app_builder(void) {
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_02), appWidgetsT->w_indicator_02, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_10 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_10"));
-   appWidgetsT->w_indicator_10 = basic_level_indicator_new(FALSE);
+   IndicatorLayout *horiz_scaling_layout = g_new(IndicatorLayout, 1);
+   horiz_scaling_layout = indicator_layout_set(horiz_scaling_layout, TRUE, TRUE, 3, 3, 3, 3);
+   appWidgetsT->w_indicator_10 = scaling_level_indicator_new(horiz_scaling_layout, FALSE);
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_10), appWidgetsT->w_indicator_10, TRUE, TRUE, 0);
+   indicator_layout_free(horiz_scaling_layout);
 
    appWidgetsT->w_indicator_box_11 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_11"));
-   appWidgetsT->w_indicator_11 = scaling_level_indicator_new(TRUE);
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_11), appWidgetsT->w_indicator_11, TRUE, TRUE, 5);
+   IndicatorLayout *vert_scaling_layout = g_new(IndicatorLayout, 1);
+   vert_scaling_layout = indicator_layout_set(vert_scaling_layout, TRUE, TRUE, 3, 3, 3, 3);
+   appWidgetsT->w_indicator_11 = scaling_level_indicator_new(vert_scaling_layout, TRUE);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_11), appWidgetsT->w_indicator_11, TRUE, TRUE, 0);
+   indicator_layout_free(vert_scaling_layout);
 
    appWidgetsT->w_indicator_box_12 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_12"));
    appWidgetsT->w_indicator_12 = basic_level_indicator_new(FALSE);
@@ -81,12 +88,18 @@ app_widget_ref_struct *app_builder(void) {
 
    appWidgetsT->w_indicator_box_20 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_20"));
    IndicatorLayout *puck_layout = g_new(IndicatorLayout, 1);
-   puck_layout = indicator_layout_set(puck_layout, TRUE, TRUE, 3, 3, 3, 3);
+   puck_layout = indicator_layout_set(puck_layout, TRUE, TRUE, 1, 1, 1, 1);
    appWidgetsT->w_indicator_20 = puck_indicator_new(puck_layout,TRUE);
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_20), appWidgetsT->w_indicator_20, TRUE, TRUE, 1);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_20), appWidgetsT->w_indicator_20, TRUE, TRUE, 0);
    indicator_layout_free(puck_layout);
 
    appWidgetsT->w_indicator_box_21 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_21"));
+   IndicatorLayout *tank_layout = g_new(IndicatorLayout, 1);
+   puck_layout = indicator_layout_set(tank_layout, TRUE, TRUE, 3, 3, 3, 3);
+   appWidgetsT->w_indicator_21 = tank_indicator_new(tank_layout, TRUE);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_21), appWidgetsT->w_indicator_21, TRUE, TRUE, 0);
+   indicator_layout_free(tank_layout);
+
    appWidgetsT->w_indicator_box_22 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_22"));
 
    g_object_bind_property(appWidgetsT->w_dial, "old_value", appWidgetsT->w_dial_label, "value", G_BINDING_DEFAULT);
@@ -96,6 +109,7 @@ app_widget_ref_struct *app_builder(void) {
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_11, "value", G_BINDING_DEFAULT);
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_12, "value", G_BINDING_DEFAULT);
    g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_20, "value", G_BINDING_DEFAULT);
+   g_object_bind_property(appWidgetsT->w_dial_label, "value", appWidgetsT->w_indicator_21, "value", G_BINDING_DEFAULT);
 
 
    gtk_builder_connect_signals(builder, appWidgetsT);
@@ -112,6 +126,8 @@ app_widget_ref_struct *app_builder(void) {
                      G_CALLBACK(on_component_clicked), appWidgetsT);
    g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_20), "button-press-event",
                      G_CALLBACK(on_component_clicked), appWidgetsT);
+   g_signal_connect (G_OBJECT(appWidgetsT->w_indicator_21), "button-press-event",
+                     G_CALLBACK(on_component_clicked), appWidgetsT);
 
    // It appears the composite/custom widgets with templates are loaded and show, where these
    // seem to need explicit exposure.
@@ -123,6 +139,7 @@ app_widget_ref_struct *app_builder(void) {
    gtk_widget_show(appWidgetsT->w_indicator_11);
    gtk_widget_show(appWidgetsT->w_indicator_12);
    gtk_widget_show(appWidgetsT->w_indicator_20);
+   gtk_widget_show(appWidgetsT->w_indicator_21);
 
    g_object_unref(builder);
    return appWidgetsT;

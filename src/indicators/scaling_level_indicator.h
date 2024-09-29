@@ -8,12 +8,13 @@
 G_BEGIN_DECLS
 #include <gtk/gtk.h>
 #include <glib-object.h>
+#include "../views/indicator_layout.h"
 
 #define SCALING_LEVEL_TYPE_INDICATOR ( scaling_level_indicator_get_type () )
 
 G_DECLARE_FINAL_TYPE(ScalingLevelIndicator, scaling_level_indicator, SCALING_LEVEL, INDICATOR, GtkWidget)
 
-GtkWidget *scaling_level_indicator_new(gboolean vertical);
+GtkWidget *scaling_level_indicator_new(IndicatorLayout *layout, gboolean vertical);
 
 gdouble scaling_level_indicator_get_value(ScalingLevelIndicator *self);
 void scaling_level_indicator_set_value(ScalingLevelIndicator *self, gdouble new_value);

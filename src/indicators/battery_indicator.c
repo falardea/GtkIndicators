@@ -157,19 +157,19 @@ static gboolean battery_indicator_draw(GtkWidget *widget, cairo_t *cr)
    g_return_val_if_fail(BATTERY_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(cr != NULL, FALSE);
 
-   int width = gtk_widget_get_allocated_width(widget);
-   int height = gtk_widget_get_allocated_height(widget);
+   float width = (float)gtk_widget_get_allocated_width(widget);
+   float height = (float)gtk_widget_get_allocated_height(widget);
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
    gtk_style_context_add_class(gtk_widget_get_style_context(widget), "battery-indicator-class");
    gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
 
    // The outline
-   int marg = 2;
-   int batt_top_height = 10;
-   int batt_top_width = 15;
-   int pad = 10;
-   int line_width = 4;
+   float marg = 2.0f;
+   float batt_top_height = 10.0f;
+   float batt_top_width = 15.0f;
+   float pad = 10.0f;
+   float line_width = 4.0f;
    cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
@@ -188,8 +188,8 @@ static gboolean battery_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_stroke(cr);
 
    // The "level"
-   gdouble eff_w = height - 2*pad - batt_top_height;
-   gdouble eff_v = eff_w * (batt->value/100);
+   float eff_w = height - 2.0f*pad - batt_top_height;
+   float eff_v = eff_w * ((float)batt->value/100.0f);
    cairo_move_to(cr, pad,           pad);
    cairo_line_to(cr, pad,           eff_v + pad);
    cairo_line_to(cr, width - pad,   eff_v + pad);

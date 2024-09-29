@@ -161,14 +161,14 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    g_return_val_if_fail(BASIC_LEVEL_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(cr != NULL, FALSE);
 
-   int width = gtk_widget_get_allocated_width(widget);
-   int height = gtk_widget_get_allocated_height(widget);
+   float width = (float)gtk_widget_get_allocated_width(widget);
+   float height = (float)gtk_widget_get_allocated_height(widget);
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
    gtk_style_context_add_class(context, "inner-indicator-class");
    gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
 
-   int line_width = 1;
+   float line_width = 1;
    cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
@@ -176,8 +176,8 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float whr = bli->vertical_orientation ? (3.0f/4.0f) : (4.0f/3.0f); // width-to-height-ratio
    float padx, pady;
 
-   float w_marg = (float)width - 2*bm;
-   float h_marg = (float)height - 2*bm;
+   float w_marg = width - 2*bm;
+   float h_marg = height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
    if (((bli->vertical_orientation) && ((w_marg/h_marg) >= whr)) ||
@@ -194,15 +194,15 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
 
    float body_left = 0 + bm + padx;
    float body_top = 0 + bm + pady;
-   float body_right = (float)width - bm - padx;
-   float body_bottom = (float)height - bm - pady;
+   float body_right = width - bm - padx;
+   float body_bottom = height - bm - pady;
 
    cairo_move_to(cr, body_left,body_top);
    cairo_line_to(cr, body_right,body_top);
    cairo_line_to(cr, body_right,body_bottom);
    cairo_line_to(cr, body_left,body_bottom);
    // Subtracting 1/2 the line width on the closing height to make sure it closes properly
-   cairo_line_to(cr, body_left,body_top - (float)line_width/2);
+   cairo_line_to(cr, body_left,body_top - line_width/2);
    cairo_stroke(cr);
 
    // The "level"
