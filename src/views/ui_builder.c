@@ -51,8 +51,11 @@ app_widget_ref_struct *app_builder(void) {
    gtk_box_pack_end(GTK_BOX(appWidgetsT->w_dial_label_box), appWidgetsT->w_dial_label, FALSE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_00 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_00"));
-   appWidgetsT->w_indicator_00 = battery_indicator_new();
+   IndicatorLayout *batt_layout = g_new(IndicatorLayout, 1);
+   batt_layout = indicator_layout_set(batt_layout, TRUE, TRUE, 3, 3, 3, 3);
+   appWidgetsT->w_indicator_00 = battery_indicator_new(batt_layout, TRUE);
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_00), appWidgetsT->w_indicator_00, TRUE, TRUE, 0);
+   indicator_layout_free(batt_layout);
 
    appWidgetsT->w_indicator_box_01 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_01"));
    appWidgetsT->w_indicator_01 = basic_level_indicator_new(TRUE);

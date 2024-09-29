@@ -7,12 +7,13 @@
 G_BEGIN_DECLS
 #include <gtk/gtk.h>
 #include <glib-object.h>
+#include "../views/indicator_layout.h"
 
 #define BATTERY_TYPE_INDICATOR ( battery_indicator_get_type () )
 
 G_DECLARE_FINAL_TYPE(BatteryIndicator, battery_indicator, BATTERY, INDICATOR, GtkWidget)
 
-GtkWidget *battery_indicator_new(void);
+GtkWidget *battery_indicator_new(IndicatorLayout *layout, gboolean vertical);
 
 gdouble battery_indicator_get_value(BatteryIndicator *self);
 void battery_indicator_set_value(BatteryIndicator *self, gdouble new_value);
