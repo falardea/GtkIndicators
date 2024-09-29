@@ -200,13 +200,11 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float cby = block_bottom;
 
    // The "background"
-   cairo_move_to(cr, ctx, cty);
-   cairo_arc(cr, ctx, cty, rad, M_PI, 0);
-   cairo_move_to(cr, cbx, cby);
-   cairo_arc(cr, cbx, cby, rad, 0, M_PI);
    cairo_move_to(cr, body_left, block_top);
+   cairo_arc(cr, ctx, cty, rad, M_PI, 0);
    cairo_line_to(cr, body_right, block_top);
    cairo_line_to(cr, body_right, block_bottom);
+   cairo_arc(cr, cbx, cby, rad, 0, M_PI);
    cairo_line_to(cr, body_left, block_bottom);
    cairo_line_to(cr, body_left, block_top);
    cairo_fill(cr);
