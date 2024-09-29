@@ -94,6 +94,8 @@ set(MY_SOURCES
     src/indicators/puck_indicator.h
     src/views/indicator_layout.c
     src/views/indicator_layout.h
+    src/indicators/scaling_level_indicator.c
+    src/indicators/scaling_level_indicator.h
 )
 
 include_directories(${PROJECT_SOURCE_DIR})

@@ -362,10 +362,9 @@ static gboolean gtk_dial_draw(GtkWidget *widget, cairo_t *cr)
    int height = gtk_widget_get_allocated_height(widget);
 
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
-
+   gtk_style_context_add_class(context, "dial-style");
    gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
-   gtk_style_context_add_class(gtk_widget_get_style_context(widget), "dial-style");
 
    xc = gtk_widget_get_allocated_width(widget) / 2;
    yc = gtk_widget_get_allocated_height(widget) / 2;

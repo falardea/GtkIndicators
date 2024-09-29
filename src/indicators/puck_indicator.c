@@ -170,10 +170,10 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
 
    int width = gtk_widget_get_allocated_width(widget);
    int height = gtk_widget_get_allocated_height(widget);
-   // GtkStyleContext  *context = gtk_widget_get_style_context(widget);
-   // gtk_render_background(context, cr, 0, 0, width, height);
-   // gtk_render_frame(context, cr, 0, 0, width, height);
-   gtk_style_context_add_class(gtk_widget_get_style_context(widget), "inner-indicator-class");
+   GtkStyleContext  *context = gtk_widget_get_style_context(widget);
+   gtk_style_context_add_class(context, "inner-indicator-class");
+   gtk_render_background(context, cr, 0, 0, width, height);
+   gtk_render_frame(context, cr, 0, 0, width, height);
 
    int line_width = 1;
    cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
@@ -183,20 +183,20 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float whr = 1.0f; // width-to-height-ratio
    float padx, pady;
 
-   float indicator_w = (float)width - 2*bm;
-   float indicator_h = (float)height - 2*bm;
+   float w_marg = (float)width - 2*bm;
+   float h_marg = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   if (((pi->vertical_orientation) && ((indicator_w/indicator_h) >= whr)) ||
-       (!(pi->vertical_orientation) && ((indicator_h/indicator_w) <= 1.0f/whr)))
+   if (((pi->vertical_orientation) && ((w_marg/h_marg) >= whr)) ||
+       (!(pi->vertical_orientation) && ((h_marg/w_marg) <= 1.0f/whr)))
    {
-      padx = (indicator_w - indicator_h*whr) / 2.0f;
+      padx = (w_marg - h_marg*whr) / 2.0f;
       pady = 0;
    }
    else
    {
       padx = 0;
-      pady = (indicator_h - indicator_w/whr) / 2.0f;
+      pady = (h_marg - w_marg/whr) / 2.0f;
    }
 
    float body_left = 0 + bm + padx;
@@ -213,48 +213,32 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_stroke(cr);
 
    // The "level"
-   float Ex, Ey, Fx, Fy, Gx, Gy, Hx, Hy, Ix, Iy, Jx, Jy;
-   float fm = bm;  // filler-margin
-   float fw = (body_right-body_left) - 2.0f*fm;  // filler-width
-   float fh = (body_bottom-body_top) - 2.0f*fm;  // filler-height
+   float fm = line_width;  // filler-margin
    float fl; // fill-level
 
-   Ex = body_left + fm;
-   Ey = body_top + fm;
-   Fx = body_right - fm;
-   Fy = Ey;
-   Gx = Fx;
-   Gy = body_bottom - fm;
-   Hx = Ex;
-   Hy = Gy;
+   float fill_left = body_left + fm;
+   float fill_top = body_top + fm;
+   float fill_right = body_right - fm;
+   float fill_bottom = body_bottom - fm;
    if (pi->vertical_orientation)
    {
-      fl = fh * (float)(pi->value/100.0f);
-      Ix = Ex;
-      Iy = Hy - fl;
-      Jx = Fx;
-      Jy = Gy - fl;
-      cairo_move_to(cr, Ix, Iy);
-      cairo_line_to(cr, Jx, Jy);
-      cairo_line_to(cr, Gx, Gy);
-      cairo_line_to(cr, Hx, Hy);
-      cairo_line_to(cr, Ix, Iy);
+      fl = ((body_bottom-body_top) - 2.0f*fm) * (float)(pi->value/100.0f);
+      cairo_move_to(cr, fill_left, fill_bottom - fl);
+      cairo_line_to(cr, fill_right, fill_bottom - fl);
+      cairo_line_to(cr, fill_right, fill_bottom);
+      cairo_line_to(cr, fill_left, fill_bottom);
+      cairo_line_to(cr, fill_left, fill_bottom - fl);
       cairo_fill(cr);
    }
    else
    {
-      fl = fw * (float)(pi->value/100.0f);
-      Ix = Ex + fl;
-      Iy = Ey;
-      Jx = Hx + fl;
-      Jy = Gy;
-      cairo_move_to(cr, Ex, Ey);
-      cairo_line_to(cr, Ix, Iy);
-      cairo_line_to(cr, Jx, Jy);
-      cairo_line_to(cr, Hx, Hy);
-      cairo_line_to(cr, Ex, Ey);
+      fl = ((body_right-body_left) - 2.0f*fm) * (float)(pi->value/100.0f);
+      cairo_move_to(cr, fill_left, fill_top);
+      cairo_line_to(cr, fill_left + fl, fill_top);
+      cairo_line_to(cr, fill_left + fl, fill_bottom);
+      cairo_line_to(cr, fill_left, fill_bottom);
+      cairo_line_to(cr, fill_left, fill_top);
       cairo_fill(cr);
-
    }
 
    return FALSE;

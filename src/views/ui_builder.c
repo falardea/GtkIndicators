@@ -11,6 +11,7 @@
 #include "indicators/basic_level_indicator.h"
 #include "indicators/bluetooth_indicator.h"
 #include "indicators/puck_indicator.h"
+#include "indicators/scaling_level_indicator.h"
 #include "views/indicator_layout.h"
 
 const double DIAL_INIT_VALUE = 0.0;
@@ -62,20 +63,20 @@ app_widget_ref_struct *app_builder(void) {
 
    appWidgetsT->w_indicator_box_10 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_10"));
    appWidgetsT->w_indicator_10 = basic_level_indicator_new(FALSE);
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_10), appWidgetsT->w_indicator_10, TRUE, TRUE, 1);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_10), appWidgetsT->w_indicator_10, TRUE, TRUE, 0);
 
    appWidgetsT->w_indicator_box_11 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_11"));
-   appWidgetsT->w_indicator_11 = basic_level_indicator_new(FALSE);
-   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_11), appWidgetsT->w_indicator_11, TRUE, TRUE, 1);
+   appWidgetsT->w_indicator_11 = scaling_level_indicator_new(TRUE);
+   gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_11), appWidgetsT->w_indicator_11, TRUE, TRUE, 5);
 
    appWidgetsT->w_indicator_box_12 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_12"));
    appWidgetsT->w_indicator_12 = basic_level_indicator_new(FALSE);
    gtk_widget_set_hexpand(appWidgetsT->w_indicator_12, TRUE);
    gtk_widget_set_vexpand(appWidgetsT->w_indicator_12, TRUE);
-   gtk_widget_set_margin_start(appWidgetsT->w_indicator_12, 5);
-   gtk_widget_set_margin_top(appWidgetsT->w_indicator_12, 5);
-   gtk_widget_set_margin_end(appWidgetsT->w_indicator_12, 5);
-   gtk_widget_set_margin_bottom(appWidgetsT->w_indicator_12, 5);
+   gtk_widget_set_margin_start(appWidgetsT->w_indicator_12, 15);
+   gtk_widget_set_margin_top(appWidgetsT->w_indicator_12, 15);
+   gtk_widget_set_margin_end(appWidgetsT->w_indicator_12, 15);
+   gtk_widget_set_margin_bottom(appWidgetsT->w_indicator_12, 15);
    gtk_grid_attach(GTK_GRID(appWidgetsT->w_indicator_box_12), appWidgetsT->w_indicator_12, 0, 0, 1, 1);
 
    appWidgetsT->w_indicator_box_20 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_20"));

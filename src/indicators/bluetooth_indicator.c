@@ -161,9 +161,10 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    int width = gtk_widget_get_allocated_width(widget);
    int height = gtk_widget_get_allocated_height(widget);
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
-   // gtk_render_background(context, cr, 0, 0, width, height);
+   gtk_style_context_add_class(context, "bluetooth-indicator-class");
+   gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
-   gtk_style_context_add_class(gtk_widget_get_style_context(widget), "bluetooth-indicator-class");
+
 
    int line_width = 1;
    cairo_set_source_rgba(cr, 0.0, 0.0, 255.0, 1.0);
@@ -172,46 +173,42 @@ static gboolean bluetooth_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float whr = 3.0f/5.0f; // width-to-height-ratio
    float padx, pady;
 
-   float indicator_w = (float)width - 2*bm;
-   float indicator_h = (float)height - 2*bm;
+   float w_marg = (float)width - 2*bm;
+   float h_marg = (float)height - 2*bm;
 
    // Trying to keep an aspect ratio to the indicator
-   if ((indicator_w/indicator_h) >= whr)
+   if ((w_marg/h_marg) >= whr)
    {
-      padx = (indicator_w - indicator_h*whr) / 2.0f;
+      padx = (w_marg - h_marg*whr) / 2.0f;
       pady = 0;
    }
    else
    {
       padx = 0;
-      pady = (indicator_h - indicator_w/whr) / 2.0f;
+      pady = (h_marg - w_marg/whr) / 2.0f;
    }
 
    float cl = (float)width/2.0f; // center line x
    float rad = cl - padx - bm;
-   float Ax = padx + bm;
-   float Ay = rad + pady + bm;
-   float Bx = (float)width - padx - bm;
-   float By = Ay;
-   float Cx = Bx;
-   float Cy = (float)height - rad - pady - bm;
-   float Dx = Ax;
-   float Dy = Cy;
+   float body_left = padx + bm;
+   float block_top = rad + pady + bm;
+   float body_right = (float)width - padx - bm;
+   float block_bottom = (float)height - rad - pady - bm;
    float ctx = cl;
-   float cty = Ay;
+   float cty = block_top;
    float cbx = ctx;
-   float cby = Cy;
+   float cby = block_bottom;
 
    // The "background"
    cairo_move_to(cr, ctx, cty);
    cairo_arc(cr, ctx, cty, rad, M_PI, 0);
    cairo_move_to(cr, cbx, cby);
    cairo_arc(cr, cbx, cby, rad, 0, M_PI);
-   cairo_move_to(cr, Ax, Ay);
-   cairo_line_to(cr, Bx, By);
-   cairo_line_to(cr, Cx, Cy);
-   cairo_line_to(cr, Dx, Dy);
-   cairo_line_to(cr, Ax, Ay);
+   cairo_move_to(cr, body_left, block_top);
+   cairo_line_to(cr, body_right, block_top);
+   cairo_line_to(cr, body_right, block_bottom);
+   cairo_line_to(cr, body_left, block_bottom);
+   cairo_line_to(cr, body_left, block_top);
    cairo_fill(cr);
 
    float fm = ( (float)height - 2*pady - 2*bm) * 0.20f;
