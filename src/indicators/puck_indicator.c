@@ -206,8 +206,8 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_source_rgba(cr, 0, 0, 0, 1.0);
    cairo_set_line_width(cr, line_width);
    float offset, puck_radius, top_span, offset_pct,  top_span_pct;
-   offset_pct = 0.0f;
-   top_span_pct = 0.6f;
+   offset_pct = 0.02f;
+   top_span_pct =0.50f;
    if (pi->vertical_orientation)
    {
       offset = (offset_pct * (body_bottom - body_top));
@@ -228,6 +228,17 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       // body
       cairo_arc(cr, width/2, ((height/2) + offset), puck_radius, 0, 2*M_PI);
       cairo_stroke(cr);
+
+      // fill
+      float f_r = puck_radius - line_width;
+      float fill_level = 2*f_r * (float)(pi->value/100.0f);
+      float beta = acosf( (f_r - fill_level) /f_r);
+      float xf = f_r * sinf(beta);
+      cairo_move_to(cr, (width/2 + xf), (body_bottom - fill_level - line_width));
+      cairo_arc(cr, (width/2), (body_bottom - puck_radius), f_r, ((M_PI/2) - beta), ((M_PI/2) + beta));
+      cairo_close_path(cr);
+      cairo_fill(cr);
+
    }
    else
    {
@@ -249,6 +260,16 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       // body
       cairo_arc(cr, ((width/2) - offset), height/2, puck_radius, 0, 2*M_PI);
       cairo_stroke(cr);
+
+      // fill
+      float f_r = puck_radius - line_width;
+      float fill_level = 2*f_r * (float)(pi->value/100.0f);
+      float beta = acosf( (f_r - fill_level) /f_r);
+      float xf = f_r * sinf(beta);
+      cairo_move_to(cr, (body_left + fill_level + line_width), (height/2 + xf));
+      cairo_arc(cr, (body_left + puck_radius), (height/2), f_r, (M_PI - beta), (M_PI + beta));
+      cairo_close_path(cr);
+      cairo_fill(cr);
    }
 
 
