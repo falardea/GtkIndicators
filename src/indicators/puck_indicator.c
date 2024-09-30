@@ -271,37 +271,6 @@ static gboolean puck_indicator_draw(GtkWidget *widget, cairo_t *cr)
       cairo_close_path(cr);
       cairo_fill(cr);
    }
-
-
-   // The filling
-   // float fm = line_width;  // filler-margin
-   // float fl; // fill-level
-   //
-   // float fill_left = body_left + fm;
-   // float fill_top = body_top + fm;
-   // float fill_right = body_right - fm;
-   // float fill_bottom = body_bottom - fm;
-   // if (pi->vertical_orientation)
-   // {
-   //    fl = ((body_bottom-body_top) - 2.0f*fm) * (float)(pi->value/100.0f);
-   //    cairo_move_to(cr, fill_left, fill_bottom - fl);
-   //    cairo_line_to(cr, fill_right, fill_bottom - fl);
-   //    cairo_line_to(cr, fill_right, fill_bottom);
-   //    cairo_line_to(cr, fill_left, fill_bottom);
-   //    cairo_line_to(cr, fill_left, fill_bottom - fl);
-   //    cairo_fill(cr);
-   // }
-   // else
-   // {
-   //    fl = ((body_right-body_left) - 2.0f*fm) * (float)(pi->value/100.0f);
-   //    cairo_move_to(cr, fill_left, fill_top);
-   //    cairo_line_to(cr, fill_left + fl, fill_top);
-   //    cairo_line_to(cr, fill_left + fl, fill_bottom);
-   //    cairo_line_to(cr, fill_left, fill_bottom);
-   //    cairo_line_to(cr, fill_left, fill_top);
-   //    cairo_fill(cr);
-   // }
-
    return FALSE;
 }
 
