@@ -88,11 +88,17 @@ static void basic_level_indicator_init(BasicLevelIndicator *bli)
    bli->old_value = 0.0;
 }
 
-GtkWidget *basic_level_indicator_new(gboolean vertical)
+GtkWidget *basic_level_indicator_new(IndicatorLayout *layout, gboolean vertical)
 {
    BasicLevelIndicator *bli = g_object_new(basic_level_indicator_get_type(), NULL);
    bli->vertical_orientation = vertical;
 
+   gtk_widget_set_hexpand(GTK_WIDGET(bli), layout->h_expand);
+   gtk_widget_set_vexpand(GTK_WIDGET(bli), layout->v_expand);
+   gtk_widget_set_margin_start(GTK_WIDGET(bli), layout->start);
+   gtk_widget_set_margin_top(GTK_WIDGET(bli), layout->top);
+   gtk_widget_set_margin_end(GTK_WIDGET(bli), layout->end);
+   gtk_widget_set_margin_bottom(GTK_WIDGET(bli), layout->bottom);
    return GTK_WIDGET(bli);
 }
 
@@ -172,50 +178,14 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
-   float bm = 0.0f; // base margin
-   float whr = bli->vertical_orientation ? (3.0f/4.0f) : (4.0f/3.0f); // width-to-height-ratio
-   float padx, pady;
-
-   float w_marg = width - 2*bm;
-   float h_marg = height - 2*bm;
-
-   // Trying to keep an aspect ratio to the indicator
-   if (((bli->vertical_orientation) && ((w_marg/h_marg) >= whr)) ||
-      (!(bli->vertical_orientation) && ((h_marg/w_marg) <= 1.0f/whr)))
-   {
-      padx = (w_marg - h_marg*whr) / 2.0f;
-      pady = 0;
-   }
-   else
-   {
-      padx = 0;
-      pady = (h_marg - w_marg/whr) / 2.0f;
-   }
-
-   float body_left = 0 + bm + padx;
-   float body_top = 0 + bm + pady;
-   float body_right = width - bm - padx;
-   float body_bottom = height - bm - pady;
-
-   cairo_move_to(cr, body_left,body_top);
-   cairo_line_to(cr, body_right,body_top);
-   cairo_line_to(cr, body_right,body_bottom);
-   cairo_line_to(cr, body_left,body_bottom);
-   // Subtracting 1/2 the line width on the closing height to make sure it closes properly
-   cairo_line_to(cr, body_left,body_top - line_width/2);
-   cairo_stroke(cr);
-
-   // The "level"
-   float fm = line_width;  // filler-margin
-   float fl; // fill-level
-
-   float fill_left = body_left + fm;
-   float fill_top = body_top + fm;
-   float fill_right = body_right - fm;
-   float fill_bottom = body_bottom - fm;
+   float fl;
+   float fill_left = 0;
+   float fill_top = 0;
+   float fill_right = width;
+   float fill_bottom = height;
    if (bli->vertical_orientation)
    {
-      fl = ((body_bottom-body_top) - 2.0f*fm) * (float)(bli->value/100.0f);
+      fl = height * (float)(bli->value/100.0f);
       cairo_move_to(cr, fill_left, fill_bottom - fl);
       cairo_line_to(cr, fill_right, fill_bottom - fl);
       cairo_line_to(cr, fill_right, fill_bottom);
@@ -225,7 +195,7 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    }
    else
    {
-      fl = ((body_right-body_left) - 2.0f*fm) * (float)(bli->value/100.0f);
+      fl = width * (float)(bli->value/100.0f);
       cairo_move_to(cr, fill_left, fill_top);
       cairo_line_to(cr, fill_left + fl, fill_top);
       cairo_line_to(cr, fill_left + fl, fill_bottom);

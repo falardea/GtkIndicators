@@ -23,7 +23,7 @@ GType indicator_layout_get_type(void) G_GNUC_CONST;
 // IndicatorLayout *indicator_layout_new(void);
 
 IndicatorLayout *indicator_layout_set(IndicatorLayout *src,
-                                      gboolean h_ex, gboolean v_ex, gint t, gint b, gint s, gint e);
+                                      gboolean h_expand, gboolean v_expand, gint top, gint bottom, gint start, gint end);
 
 IndicatorLayout *indicator_layout_copy(IndicatorLayout *src);
 

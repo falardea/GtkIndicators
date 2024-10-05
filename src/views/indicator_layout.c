@@ -11,15 +11,15 @@ G_DEFINE_BOXED_TYPE(IndicatorLayout, indicator_layout, indicator_layout_copy, in
 //
 // }
 
-IndicatorLayout *indicator_layout_set(IndicatorLayout *src, gboolean h_ex, gboolean v_ex, gint t, gint b, gint s, gint e)
+IndicatorLayout *indicator_layout_set(IndicatorLayout *src, gboolean h_expand, gboolean v_expand, gint top, gint bottom, gint start, gint end)
 {
    g_return_val_if_fail(src != NULL, NULL);
-   src->h_expand = h_ex;
-   src->v_expand = v_ex;
-   src->top = t;
-   src->bottom = b;
-   src->start = s;
-   src->end = e;
+   src->h_expand = h_expand;
+   src->v_expand = v_expand;
+   src->top = top;
+   src->bottom = bottom;
+   src->start = start;
+   src->end = end;
    return src;
 }
 
