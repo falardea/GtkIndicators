@@ -83,11 +83,11 @@ app_widget_ref_struct *app_builder(void) {
    indicator_layout_free(vert_scaling_layout);
 
    appWidgetsT->w_indicator_box_12 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_12"));
-   IndicatorLayout *basio2_layout = g_new(IndicatorLayout, 1);
-   basio_layout = indicator_layout_set(basio2_layout, TRUE, TRUE, 10, 10, 3, 3);
-   appWidgetsT->w_indicator_12 = basic_level_indicator_new(basio2_layout, FALSE);
+   IndicatorLayout *basic2_layout = g_new(IndicatorLayout, 1);
+   basio_layout = indicator_layout_set(basic2_layout, TRUE, TRUE, 0, 0, 0, 0);
+   appWidgetsT->w_indicator_12 = basic_level_indicator_new(basic2_layout, FALSE);
    gtk_grid_attach(GTK_GRID(appWidgetsT->w_indicator_box_12), appWidgetsT->w_indicator_12, 0, 0, 1, 1);
-   indicator_layout_free(basio2_layout);
+   indicator_layout_free(basic2_layout);
 
    appWidgetsT->w_indicator_box_20 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_20"));
    IndicatorLayout *puck_layout = g_new(IndicatorLayout, 1);

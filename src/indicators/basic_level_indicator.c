@@ -167,42 +167,61 @@ static gboolean basic_level_indicator_draw(GtkWidget *widget, cairo_t *cr)
    g_return_val_if_fail(BASIC_LEVEL_IS_INDICATOR(widget), FALSE);
    g_return_val_if_fail(cr != NULL, FALSE);
 
-   float width = (float)gtk_widget_get_allocated_width(widget);
-   float height = (float)gtk_widget_get_allocated_height(widget);
+   int width = gtk_widget_get_allocated_width(widget);
+   int height = gtk_widget_get_allocated_height(widget);
    GtkStyleContext  *context = gtk_widget_get_style_context(widget);
-   gtk_style_context_add_class(context, "inner-indicator-class");
+   gtk_style_context_add_class(context, "icon-indicator-class");
    gtk_render_background(context, cr, 0, 0, width, height);
    gtk_render_frame(context, cr, 0, 0, width, height);
 
+   GdkPixbuf *icon_overlay, *scaled;
+   icon_overlay = gdk_pixbuf_new_from_resource("/resource_path/resources/images/battery_level.svg", NULL);
+
+   int img_width, img_height;
+   img_width = gdk_pixbuf_get_width(icon_overlay);
+   img_height = gdk_pixbuf_get_height(icon_overlay);
+
    float line_width = 1;
-   cairo_set_source_rgba(cr, 0.0, 255, 0.0, 1.0);
+   cairo_set_source_rgba(cr, 255.0, 0.0, 0.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
    float fl;
    float fill_left = 0;
    float fill_top = 0;
-   float fill_right = width;
-   float fill_bottom = height;
+   float fill_right = (float)width;
+   float fill_bottom = (float)height;
    if (bli->vertical_orientation)
    {
-      fl = height * (float)(bli->value/100.0f);
+      fl = (float)height * (float)(bli->value/100.0f);
       cairo_move_to(cr, fill_left, fill_bottom - fl);
       cairo_line_to(cr, fill_right, fill_bottom - fl);
       cairo_line_to(cr, fill_right, fill_bottom);
       cairo_line_to(cr, fill_left, fill_bottom);
       cairo_line_to(cr, fill_left, fill_bottom - fl);
       cairo_fill(cr);
+
+      scaled = gdk_pixbuf_scale_simple(icon_overlay, width, height, GDK_INTERP_BILINEAR);
    }
    else
    {
-      fl = width * (float)(bli->value/100.0f);
+      fl = (float)width * (float)(bli->value/100.0f);
       cairo_move_to(cr, fill_left, fill_top);
       cairo_line_to(cr, fill_left + fl, fill_top);
       cairo_line_to(cr, fill_left + fl, fill_bottom);
       cairo_line_to(cr, fill_left, fill_bottom);
       cairo_line_to(cr, fill_left, fill_top);
       cairo_fill(cr);
+      scaled = gdk_pixbuf_rotate_simple(icon_overlay, 270);
+      scaled = gdk_pixbuf_scale_simple(scaled, width, height, GDK_INTERP_BILINEAR);
    }
+
+   cairo_move_to(cr, 0, 0);
+
+
+   gdk_cairo_set_source_pixbuf(cr, scaled, 0, 0);
+
+   cairo_paint(cr);
+
    return FALSE;
 }
 

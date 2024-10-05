@@ -35,3 +35,11 @@ box.custom-widget-style
 
 .inner-indicator-class {
 }
+
+.icon-indicator-class {
+  background-image: none;
+  background-color: yellow;
+  border-radius: 10px 10px 10px 10px;
+  //background-image: url("resource:///resource_path/resources/images/battery_level.svg");
+  //background-size: 100% 100%;
+}
