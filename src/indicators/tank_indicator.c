@@ -162,6 +162,73 @@ static void tank_indicator_size_allocate(GtkWidget *widget, GtkAllocation *alloc
    }
 }
 
+static  float hypotenuse(float dx, float dy)
+{
+   return sqrtf(powf(dx,2) + powf(dy,2));
+}
+
+/**
+ * @brief draw a "tank" in the o
+ * @param w
+ * @param h
+ * @param vw_p
+ * @param vh_p
+ */
+static void draw_tank_body(cairo_t *cr,
+                           float canvas_width, float canvas_height,
+                           float top, float bottom,
+                           float left, float right,
+                           float valve_w_pcnt, float valve_h_pcnt,
+                           float lw,
+                           gboolean vert)
+{
+   float valve_len, valve_span, radius;
+   if (vert)
+   {
+      valve_len = valve_h_pcnt * (bottom - top);
+      valve_span = valve_w_pcnt * (right - left);
+      radius = (right-left)/2.0f;
+
+      cairo_move_to(cr, left,top + radius + valve_len);
+      cairo_arc(cr, (canvas_width/2), (top + radius + valve_len), radius, M_PI, 0);
+      cairo_line_to(cr, right,bottom);
+      cairo_line_to(cr, left,bottom);
+      cairo_line_to(cr, left,top + radius + valve_len);
+      cairo_stroke(cr);
+      // valve
+      cairo_set_line_width(cr, lw*2);
+      cairo_move_to(cr, canvas_width/2, top+valve_len);
+      cairo_line_to(cr, canvas_width/2, top);
+      cairo_stroke(cr);
+      cairo_set_line_width(cr, lw);
+      cairo_move_to(cr, (canvas_width/2)-(valve_span/2), top);
+      cairo_line_to(cr, (canvas_width/2)+(valve_span/2), top);
+      cairo_stroke(cr);
+   }
+   else
+   {
+      valve_len = valve_h_pcnt * (right - left);
+      valve_span = valve_w_pcnt * (bottom - top);
+      radius = (bottom-top)/2.0f;
+
+      cairo_move_to(cr, right - radius - valve_len,top);
+      cairo_arc(cr, right - radius - valve_len, canvas_height/2, radius, 3*M_PI/2, M_PI/2);
+      cairo_line_to(cr, left,bottom);
+      cairo_line_to(cr, left,top);
+      cairo_line_to(cr, right - radius - valve_len,top);
+      cairo_stroke(cr);
+      // valve
+      cairo_set_line_width(cr, lw*2);
+      cairo_move_to(cr, right - valve_len, canvas_height/2);
+      cairo_line_to(cr, right, canvas_height/2);
+      cairo_stroke(cr);
+      cairo_set_line_width(cr, lw);
+      cairo_move_to(cr, right, (canvas_height/2)-(valve_span));
+      cairo_line_to(cr, right, (canvas_height/2)+(valve_span));
+      cairo_stroke(cr);
+   }
+
+}
 static gboolean tank_indicator_draw(GtkWidget *widget, cairo_t *cr)
 {
    TankIndicator *tnk = TANK_INDICATOR(widget);
@@ -197,7 +264,7 @@ static gboolean tank_indicator_draw(GtkWidget *widget, cairo_t *cr)
    }
 
    // Make the line width proportional to the hypotenuse of the indicator content area
-   float line_width = 0.004f * sqrtf(powf((w_marg - 2*padx),2) + powf((h_marg- 2*pady),2));
+   float line_width = 0.04f * hypotenuse((w_marg - 2*padx), (h_marg- 2*pady));
 
    float body_left = padx + 0.5f*(width - w_marg + line_width);
    float body_top = pady + 0.5f*(height - h_marg + line_width);
@@ -205,90 +272,127 @@ static gboolean tank_indicator_draw(GtkWidget *widget, cairo_t *cr)
    float body_bottom = 0.5f*(height + h_marg - line_width) - pady;
 
    // The filling
-   float fm = 5; //line_width;  // filler-margin
+   // Caution: as fill margins and line widths approach the inner width/height, things get wonky...
+   // There's a pseudo-clamp on the filler-margin, but that could be reworked
+   float fm = 1 * line_width;  // filler-margin
    float fl, rad;
    float valve_len, valve_span;
-   float valve_pcnt = 0.15f;
+   float valve_pcnt = 0.10f;
    float valve_span_pcnt = 0.3f;
    cairo_set_source_rgba(cr, 0, 0, 255.0, 1.0);
    cairo_set_line_width(cr, line_width);
 
+   if (tnk->vertical_orientation){
+      if (2*fm > body_right-body_left){
+         fm = (body_right-body_left - 0.01f*(body_right-body_left))/2;
+      }
+   } else if (2*fm > body_bottom-body_top)
+   {
+      fm = (body_bottom-body_top - 0.01f*(body_bottom-body_top))/2;
+   }
+
+   draw_tank_body(cr, width, height,
+                  body_top, body_bottom,
+                  body_left, body_right,
+                  valve_span_pcnt, valve_pcnt,
+                  line_width,
+                  tnk->vertical_orientation);
    if (tnk->vertical_orientation)
    {
-      // body
       valve_len = valve_pcnt * (body_bottom - body_top);
       valve_span = valve_span_pcnt * (body_right - body_left);
       rad = (body_right-body_left)/2.0f;
-      cairo_move_to(cr, body_left,body_top + rad + valve_len);
-      cairo_arc(cr, (width/2), (body_top + rad + valve_len), rad, M_PI, 0);
-      cairo_line_to(cr, body_right,body_bottom);
-      cairo_line_to(cr, body_left,body_bottom);
-      cairo_line_to(cr, body_left,body_top + rad + valve_len);
-      cairo_stroke(cr);
-      // valve
-      cairo_set_line_width(cr, line_width*2);
-      cairo_move_to(cr, width/2, body_top+valve_len);
-      cairo_line_to(cr, width/2, body_top);
-      cairo_stroke(cr);
-      cairo_set_line_width(cr, line_width);
-      cairo_move_to(cr, (width/2)-(valve_span/2), body_top);
-      cairo_line_to(cr, (width/2)+(valve_span/2), body_top);
-      cairo_stroke(cr);
       // fill
-      float fill_height = (body_bottom - body_top - valve_len - fm);
+      float inner_height = (body_bottom - body_top - valve_len);
+      float fill_height = inner_height - 2*fm;
       float fill_rad = rad - fm;
       fl = fill_height * (float)tnk->value/100.0f;
       float fill_block_top = body_bottom - fm - (fill_height - fill_rad);
-      if (fl <= fill_height-fill_rad)
-      {
-         // fill up to curved portion normally
-         cairo_move_to(cr, body_left + fm, body_bottom - fm - fl);
-         cairo_line_to(cr, body_right - fm, body_bottom - fm - fl);
-         cairo_line_to(cr, body_right - fm, body_bottom - fm);
-         cairo_line_to(cr, body_left+fm, body_bottom - fm);
-         cairo_line_to(cr, body_left + fm, body_bottom - fm - fl);
-         cairo_stroke(cr);
-      }
-      else
-      {
-         // fill all up to the curved portion
-         // float fill_block_top = body_bottom - fm - (fill_height - fill_rad);
-         float fill_remain = fl - (fill_height - fill_rad);
-         float beta = asinf(fill_remain/fill_rad);
-         float arc_top_x = fill_rad*cosf(beta);
-         cairo_move_to(cr, body_left + fm, fill_block_top);
-         cairo_arc(cr, (width/2), (body_top + rad + valve_len), fill_rad, M_PI, M_PI+beta);
-         cairo_line_to(cr, (width/2) + arc_top_x, fill_block_top-fill_remain + fm);
-         cairo_arc(cr, (width/2), (body_top + rad + valve_len), fill_rad, (3*M_PI/2) + ((M_PI/2) - beta), 2*M_PI);
-         // cairo_line_to(cr, body_right - fm, fill_block_top);
-         cairo_line_to(cr, body_right - fm, body_bottom - fm);
-         cairo_line_to(cr, body_left+fm, body_bottom - fm);
-         cairo_line_to(cr, body_left + fm, fill_block_top);
-         cairo_stroke(cr);
+
+      if (tnk->value > 0) {
+         if (fl <= (fill_height - fill_rad)) {
+            // fill up to curved portion normally
+            cairo_move_to(cr, body_left + fm, body_bottom - fm - fl);
+            cairo_line_to(cr, body_right - fm, body_bottom - fm - fl);
+            cairo_line_to(cr, body_right - fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm - fl);
+            cairo_fill(cr);
+         } else if (tnk->value < 100.0f) {
+            // fill all up to the curved portion
+            // float fill_block_top = body_bottom - fm - (fill_height - fill_rad);
+            float fill_remain = fl - (fill_height - fill_rad);
+            float beta = asinf(fill_remain / fill_rad);
+            float arc_top_x = fill_rad * cosf(beta);
+            cairo_move_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, fill_block_top);
+            cairo_arc(cr, (width / 2), (body_top + rad + valve_len), fill_rad, M_PI, M_PI + beta);
+            cairo_line_to(cr, (width / 2) + arc_top_x, fill_block_top - fill_remain);
+            cairo_arc(cr, (width / 2), (body_top + rad + valve_len), fill_rad, (3 * M_PI / 2) + ((M_PI / 2) - beta),
+                      2 * M_PI);
+            // cairo_line_to(cr, body_right - fm, fill_block_top);
+            cairo_line_to(cr, body_right - fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, fill_block_top);
+            cairo_fill(cr);
+         } else {
+            cairo_move_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, fill_block_top);
+            cairo_arc(cr, (width / 2), (body_top + rad + valve_len), fill_rad, M_PI, 2*M_PI);
+            // cairo_line_to(cr, body_right - fm, fill_block_top);
+            cairo_line_to(cr, body_right - fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, fill_block_top);
+            cairo_fill(cr);
+         }
       }
    }
    else
    {
-      valve_len = valve_pcnt * (body_right - body_left);
+      valve_len = valve_pcnt * (body_right  - body_left);
       valve_span = valve_span_pcnt * (body_bottom - body_top);
       rad = (body_bottom-body_top)/2.0f;
-      cairo_move_to(cr, body_right - rad - valve_len,body_top);
-      cairo_arc(cr, body_right - rad - valve_len, height/2, rad, 3*M_PI/2, M_PI/2);
-      cairo_line_to(cr, body_left,body_bottom);
-      cairo_line_to(cr, body_left,body_top);
-      cairo_line_to(cr, body_right - rad - valve_len,body_top);
-      cairo_stroke(cr);
-      // valve
-      cairo_set_line_width(cr, line_width*2);
-      cairo_move_to(cr, body_right - valve_len, height/2);
-      cairo_line_to(cr, body_right, height/2);
-      cairo_stroke(cr);
-      cairo_set_line_width(cr, line_width);
-      cairo_move_to(cr, body_right, (height/2)-(valve_span));
-      cairo_line_to(cr, body_right, (height/2)+(valve_span));
-      cairo_stroke(cr);
       // fill
+      float inner_height = (body_right - body_left - valve_len);
+      float fill_height = inner_height - 2*fm;
+      float fill_rad = rad - fm;
+      fl = fill_height * (float)tnk->value/100.0f;
+      float fill_block_right = body_left + fm + (fill_height - fill_rad);
+
+      if (tnk->value > 0) {
+         if (fl <= (fill_height - fill_rad)) {
+            // fill up to curved portion normally
+            cairo_move_to(cr, body_left + fm, body_top + fm);
+            cairo_line_to(cr, body_left + fm + fl, body_top + fm);
+            cairo_line_to(cr, body_left + fm + fl, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_top + fm);
+            cairo_fill(cr);
+         } else if (tnk->value < 100.0f) {
+            // fill all up to the curved portion
+            // float fill_block_top = body_bottom - fm - (fill_height - fill_rad);
+            float fill_remain = fl - (fill_height - fill_rad);
+            float beta = asinf(fill_remain / fill_rad);
+            float arc_top_y = fill_rad * cosf(beta);
+            cairo_move_to(cr, body_left + fm, body_top + fm);
+            cairo_line_to(cr, fill_block_right, body_top + fm);
+            cairo_arc(cr, fill_block_right, height/2, fill_rad, ((3*M_PI)/2), ((3*M_PI)/2) + beta);
+            cairo_line_to(cr, body_left + fm + fl, (height/2)+arc_top_y);
+            cairo_arc(cr, fill_block_right, height/2, fill_rad, (M_PI/2) - beta,M_PI/2);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_top + fm);
+            cairo_fill(cr);
+         } else {
+            cairo_move_to(cr, body_left + fm, body_top + fm);
+            cairo_line_to(cr, fill_block_right, body_top + fm);
+            cairo_arc(cr, fill_block_right, height/2, fill_rad, (3*M_PI/2), M_PI/2);
+            cairo_line_to(cr, body_left + fm, body_bottom - fm);
+            cairo_line_to(cr, body_left + fm, body_top + fm);
+            cairo_fill(cr);
+         }
+      }
    }
+
    return FALSE;
 }
 

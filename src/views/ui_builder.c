@@ -98,8 +98,8 @@ app_widget_ref_struct *app_builder(void) {
 
    appWidgetsT->w_indicator_box_21 = GTK_WIDGET(gtk_builder_get_object(builder, "indicator_box_21"));
    IndicatorLayout *tank_layout = g_new(IndicatorLayout, 1);
-   puck_layout = indicator_layout_set(tank_layout, TRUE, TRUE, 3, 3, 3, 3);
-   appWidgetsT->w_indicator_21 = tank_indicator_new(tank_layout, TRUE);
+   tank_layout = indicator_layout_set(tank_layout, TRUE, TRUE, 0, 0, 0, 0);
+   appWidgetsT->w_indicator_21 = tank_indicator_new(tank_layout, FALSE);
    gtk_box_pack_start(GTK_BOX(appWidgetsT->w_indicator_box_21), appWidgetsT->w_indicator_21, TRUE, TRUE, 0);
    indicator_layout_free(tank_layout);
 
